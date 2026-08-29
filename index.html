@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ChenMeの脚トリセツ ｜ 脚タイプ診断</title>
+<meta name="description" content="5つの質問で、あなたの脚のタイプと今日からのケアがわかる。ChenMeの脚トリセツ。">
+<meta property="og:title" content="ChenMeの脚トリセツ ｜ 脚タイプ診断">
+<meta property="og:description" content="5つの質問で、あなたの脚のタイプと今日からのケアがわかる。">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FFFBF9;
+  --pale:#FCE7EA;
+  --blush:#F7D6DD;
+  --champagne:#EFE3D6;
+  --rose:#C8456A;
+  --rose-soft:#E091A6;
+  --indigo:#4A5FA5;
+  --ink:#584F4C;
+  --ink-soft:#9A8E89;
+  --line:rgba(200,69,106,.16);
+  --r:26px;
+  --shadow:0 18px 40px -24px rgba(160,90,110,.45);
+  --serif:"Shippori Mincho B1",serif;
+  --sans:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",sans-serif;
+  --latin:"Cormorant Garamond","Shippori Mincho B1",serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--sans);
+  color:var(--ink);
+  background:
+    radial-gradient(120% 70% at 50% -10%, #FFF3F5 0%, rgba(255,251,249,0) 60%),
+    linear-gradient(180deg,var(--paper) 0%, #FDF4F2 55%, var(--pale) 100%);
+  background-attachment:fixed;
+  min-height:100svh;
+  font-weight:300;
+  line-height:1.9;
+  letter-spacing:.04em;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:520px;margin:0 auto;padding:28px 22px 64px;position:relative;z-index:1}
+
+/* ── 花びら（背景の空気感） ── */
+.petals{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.petal{position:absolute;width:14px;height:14px;border-radius:14px 2px 14px 2px;
+  background:linear-gradient(140deg,#FAD3DC,#F6BFCC);opacity:.55;
+  animation:fall linear infinite}
+@keyframes fall{
+  0%{transform:translate3d(0,-12vh,0) rotate(0deg);opacity:0}
+  12%{opacity:.6}
+  100%{transform:translate3d(28px,112vh,0) rotate(320deg);opacity:0}
+}
+
+/* ── 共通パーツ ── */
+.eyebrow{font-family:var(--latin);font-size:12px;letter-spacing:.34em;
+  text-transform:uppercase;color:var(--rose-soft);text-align:center;margin:0 0 14px}
+.rule{width:1px;height:44px;margin:0 auto;background:linear-gradient(180deg,transparent,var(--rose-soft),transparent)}
+.card{background:rgba(255,255,255,.86);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--shadow);backdrop-filter:blur(6px)}
+.screen{display:none;animation:rise .55s cubic-bezier(.22,.8,.3,1) both}
+.screen.is-on{display:block}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ── 表紙 ── */
+.cover{text-align:center;padding:44px 26px 38px}
+.logo{font-family:var(--latin);font-size:30px;letter-spacing:.16em;color:#6B6560;margin:0}
+.logo-sub{font-family:var(--latin);font-size:11px;letter-spacing:.3em;color:var(--ink-soft);margin:6px 0 30px}
+.cover h1{font-family:var(--serif);font-weight:500;font-size:31px;line-height:1.62;
+  margin:0 0 6px;letter-spacing:.06em}
+.cover h1 .accent{color:var(--rose)}
+.cover .lead{font-size:14px;color:var(--ink-soft);margin:20px auto 0;max-width:19em;line-height:2.1}
+.meta{display:flex;justify-content:center;gap:22px;margin:28px 0 8px;
+  font-family:var(--latin);font-size:12px;letter-spacing:.2em;color:var(--ink-soft)}
+.meta span{position:relative}
+.meta span+span::before{content:"";position:absolute;left:-12px;top:50%;width:1px;height:11px;
+  background:var(--line);transform:translateY(-50%)}
+
+/* ── ボタン ── */
+.btn{display:block;width:100%;border:0;cursor:pointer;font-family:var(--sans);
+  font-size:15px;letter-spacing:.16em;font-weight:400;color:#fff;
+  padding:19px 20px;border-radius:999px;
+  background:linear-gradient(120deg,#E48DA5 0%,#C8456A 100%);
+  box-shadow:0 12px 26px -14px rgba(200,69,106,.8);
+  transition:transform .25s ease, box-shadow .25s ease}
+.btn:hover{transform:translateY(-2px);box-shadow:0 18px 30px -16px rgba(200,69,106,.9)}
+.btn:active{transform:translateY(0)}
+.btn.ghost{background:transparent;color:var(--rose);border:1px solid var(--line);box-shadow:none}
+.btn.ghost:hover{background:rgba(252,231,234,.5)}
+.btn-note{text-align:center;font-size:11.5px;color:var(--ink-soft);letter-spacing:.12em;margin:14px 0 0}
+
+/* ── 質問 ── */
+.progress{display:flex;align-items:center;gap:9px;justify-content:center;margin:6px 0 26px}
+.dot{width:26px;height:2px;border-radius:2px;background:var(--blush);transition:background .4s ease}
+.dot.done{background:var(--rose)}
+.q-no{font-family:var(--latin);font-size:12px;letter-spacing:.3em;color:var(--rose-soft);
+  text-align:center;margin:0 0 12px}
+.q-text{font-family:var(--serif);font-size:21px;line-height:1.78;text-align:center;
+  margin:0 auto 30px;max-width:15.5em;font-weight:500;letter-spacing:.04em}
+.opts{display:flex;flex-direction:column;gap:11px;list-style:none;padding:0;margin:0}
+.opt{width:100%;text-align:left;font-family:var(--sans);font-size:14.5px;line-height:1.75;
+  color:var(--ink);background:rgba(255,255,255,.9);border:1px solid var(--line);
+  border-radius:18px;padding:17px 18px 17px 46px;cursor:pointer;position:relative;
+  transition:border-color .25s, background .25s, transform .18s}
+.opt::before{content:"";position:absolute;left:19px;top:50%;transform:translateY(-50%);
+  width:9px;height:9px;border-radius:50%;border:1px solid var(--rose-soft);transition:background .25s}
+.opt:hover{border-color:var(--rose-soft);transform:translateX(2px)}
+.opt:hover::before{background:var(--blush)}
+.opt.picked{border-color:var(--rose);background:#FFF6F8}
+.opt.picked::before{background:var(--rose);border-color:var(--rose)}
+.back{display:block;margin:22px auto 0;background:none;border:0;color:var(--ink-soft);
+  font-family:var(--sans);font-size:12.5px;letter-spacing:.16em;cursor:pointer}
+.back:hover{color:var(--rose)}
+
+/* ── 結果 ── */
+.tag{position:relative;text-align:center;padding:40px 24px 34px;overflow:hidden}
+.tag::before,.tag::after{content:"";position:absolute;left:50%;transform:translateX(-50%);
+  width:64%;height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent)}
+.tag::before{top:18px}.tag::after{bottom:18px}
+.tag-label{font-family:var(--latin);font-size:11px;letter-spacing:.34em;color:var(--rose-soft);margin:0 0 18px}
+.emoji{font-size:42px;line-height:1;display:block;margin:0 0 14px}
+.type-jp{font-family:var(--serif);font-size:29px;font-weight:600;letter-spacing:.08em;margin:0;color:var(--rose)}
+.type-sub{font-size:12.5px;letter-spacing:.2em;color:var(--ink-soft);margin:8px 0 20px}
+.catch{font-family:var(--serif);font-size:17.5px;line-height:1.95;margin:0 auto;max-width:15em;letter-spacing:.05em}
+
+.sect{padding:30px 24px}
+.sect+.sect{border-top:1px solid rgba(200,69,106,.1)}
+.sect h3{font-family:var(--serif);font-size:15px;font-weight:600;letter-spacing:.14em;
+  margin:0 0 16px;color:var(--rose);display:flex;align-items:center;gap:10px}
+.sect h3::after{content:"";flex:1;height:1px;background:var(--line)}
+.sect p{font-size:14px;line-height:2.05;margin:0 0 12px}
+.sect p:last-child{margin-bottom:0}
+.traits{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 18px;padding:0;list-style:none}
+.traits li{font-size:12px;letter-spacing:.08em;color:var(--rose);background:#FFF3F6;
+  border:1px solid var(--line);border-radius:999px;padding:6px 13px}
+.care{list-style:none;padding:0;margin:0;counter-reset:c}
+.care li{counter-increment:c;position:relative;padding:0 0 18px 42px;font-size:14px;line-height:1.95}
+.care li:last-child{padding-bottom:0}
+.care li::before{content:counter(c,decimal-leading-zero);position:absolute;left:0;top:0;
+  font-family:var(--latin);font-size:14px;letter-spacing:.1em;color:var(--rose-soft)}
+.care li b{display:block;font-weight:500;font-size:14.5px;letter-spacing:.06em;margin-bottom:2px}
+.story{background:linear-gradient(170deg,#FFF7F4,#FCE7EA);border-radius:var(--r);
+  padding:30px 24px;margin:0;border:1px solid var(--line)}
+.story .pl{font-family:var(--latin);font-size:11px;letter-spacing:.3em;color:var(--rose-soft);margin:0 0 10px}
+.story h4{font-family:var(--serif);font-size:19px;font-weight:500;letter-spacing:.06em;margin:0 0 14px;line-height:1.7}
+.story p{font-size:14px;line-height:2.05;margin:0 0 14px}
+.quote{font-family:var(--serif);font-size:15px;line-height:2;color:var(--rose);
+  border-left:1px solid var(--rose-soft);padding-left:15px;margin:18px 0 22px}
+
+/* ── シェア ── */
+.share-box{padding:28px 24px}
+.share-text{background:#FFF8F9;border:1px dashed var(--rose-soft);border-radius:16px;
+  padding:17px 18px;font-size:13px;line-height:1.95;white-space:pre-wrap;margin:0 0 14px;color:var(--ink)}
+.share-row{display:flex;gap:10px}
+.share-row .btn{padding:15px 10px;font-size:13.5px;letter-spacing:.1em}
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);opacity:0;
+  background:rgba(88,79,76,.94);color:#fff;font-size:12.5px;letter-spacing:.1em;
+  padding:12px 22px;border-radius:999px;pointer-events:none;transition:.35s;z-index:9}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* ── 他タイプ ── */
+.others{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0;margin:0;list-style:none}
+.others li{background:rgba(255,255,255,.8);border:1px solid var(--line);border-radius:16px;
+  padding:15px 10px;text-align:center;font-size:12.5px;letter-spacing:.06em;color:var(--ink-soft)}
+.others li .e{display:block;font-size:22px;margin-bottom:6px}
+.others li b{display:block;font-family:var(--serif);font-size:14px;color:var(--ink);font-weight:500;letter-spacing:.08em}
+.foot{text-align:center;font-size:11px;color:var(--ink-soft);line-height:2;margin:34px 0 0;letter-spacing:.08em}
+.stack>*+*{margin-top:16px}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+:focus-visible{outline:2px solid var(--rose);outline-offset:3px;border-radius:8px}
+</style>
+</head>
+<body>
+<div class="petals" id="petals" aria-hidden="true"></div>
+
+<div class="wrap">
+
+  <!-- 表紙 -->
+  <section class="screen is-on" id="s-intro">
+    <div class="card cover">
+      <p class="logo">ChenMe</p>
+      <p class="logo-sub">TONIGHT, FOR MYSELF</p>
+      <h1>ChenMeの<br><span class="accent">脚トリセツ</span></h1>
+      <div class="rule" style="height:30px;margin:18px auto"></div>
+      <p class="lead">その脚には、その脚の扱い方がある。<br>5つの質問で、あなたのタイプと<br>今夜からのケアがわかります。</p>
+      <div class="meta"><span>5 QUESTIONS</span><span>ABOUT 1 MIN</span></div>
+    </div>
+    <div class="stack" style="margin-top:18px">
+      <button class="btn" id="start">診断をはじめる</button>
+      <p class="btn-note">登録不要。結果はその場で表示されます。</p>
+    </div>
+  </section>
+
+  <!-- 質問 -->
+  <section class="screen" id="s-quiz">
+    <div class="progress" id="dots" aria-hidden="true"></div>
+    <div class="card" style="padding:34px 22px 30px">
+      <p class="q-no" id="q-no">Q1</p>
+      <h2 class="q-text" id="q-text"></h2>
+      <div class="opts" id="opts" role="group" aria-label="選択肢"></div>
+    </div>
+    <button class="back" id="back">← ひとつ前にもどる</button>
+  </section>
+
+  <!-- 結果 -->
+  <section class="screen" id="s-result">
+    <div class="card tag">
+      <p class="tag-label">YOUR LEG TYPE</p>
+      <span class="emoji" id="r-emoji"></span>
+      <h2 class="type-jp" id="r-name"></h2>
+      <p class="type-sub" id="r-sub"></p>
+      <p class="catch" id="r-catch"></p>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="sect">
+        <h3>あなたの脚のこと</h3>
+        <ul class="traits" id="r-traits"></ul>
+        <p id="r-desc"></p>
+      </div>
+      <div class="sect">
+        <h3>今夜からの3ステップ</h3>
+        <ol class="care" id="r-care"></ol>
+      </div>
+    </div>
+
+    <div class="story" style="margin-top:16px">
+      <p class="pl">YOUR PARTNER</p>
+      <h4 id="r-story-h"></h4>
+      <p id="r-story-p"></p>
+      <p class="quote" id="r-story-q"></p>
+      <a class="btn" id="cta" href="#" style="text-decoration:none;text-align:center">ほぐほぐクリームを見る</a>
+      <p class="btn-note">今日より明日、もっとスッキリ。</p>
+    </div>
+
+    <div class="card share-box" style="margin-top:16px">
+      <h3 style="font-family:var(--serif);font-size:15px;font-weight:600;letter-spacing:.14em;margin:0 0 14px;color:var(--rose)">結果をシェアする</h3>
+      <div class="share-text" id="share-text"></div>
+      <div class="share-row">
+        <button class="btn" id="share-x">Xでシェア</button>
+        <button class="btn ghost" id="share-copy">文面をコピー</button>
+      </div>
+      <p class="btn-note">コピーして、ストーリーズにもどうぞ。</p>
+    </div>
+
+    <div class="card" style="margin-top:16px;padding:26px 22px">
+      <h3 style="font-family:var(--serif);font-size:15px;font-weight:600;letter-spacing:.14em;margin:0 0 16px;color:var(--rose)">ほかの3タイプ</h3>
+      <ul class="others" id="r-others"></ul>
+    </div>
+
+    <div class="stack" style="margin-top:18px">
+      <button class="btn ghost" id="retry">もう一度診断する</button>
+    </div>
+
+    <p class="foot">※ この診断は生活習慣からの傾向をお伝えするもので、<br>医学的な診断ではありません。<br><br>ChenMe</p>
+  </section>
+
+</div>
+<div class="toast" id="toast">コピーしました</div>
+
+<script>
+"use strict";
+
+/* ─────────── 設定 ─────────── */
+const SHOP_URL = "https://example.com/chenme/hoguhogu"; // ← 商品ページURLに差し替え
+const SITE_URL = location.href.split("#")[0];
+
+/* ─────────── 質問 ─────────── */
+const QUESTIONS = [
+  {
+    q:"夕方、靴を脱いだとき。<br>あなたの脚は？",
+    a:[
+      {t:"靴下の跡が、くっきり残っている", s:{rakko:2, neko:1}},
+      {t:"ふくらはぎが張って、パンパン", s:{shika:2, rakko:1}},
+      {t:"見た目は変わらないけれど、指先が冷たい", s:{neko:2}},
+      {t:"疲れてはいるけれど、形はあまり変わらない", s:{uma:2, shika:1}}
+    ]
+  },
+  {
+    q:"ふくらはぎを、<br>指でゆっくり押してみて。",
+    a:[
+      {t:"硬い。指を押し返してくる感じ", s:{shika:2, uma:1}},
+      {t:"やわらかくて、指のあとがしばらく残る", s:{rakko:2}},
+      {t:"薄い。骨が近い感じがする", s:{neko:2}},
+      {t:"弾力がある。押すとすぐ戻る", s:{uma:2}}
+    ]
+  },
+  {
+    q:"あなたの一日は、<br>どんなふうに過ぎていく？",
+    a:[
+      {t:"立ちっぱなし、歩きっぱなしが多い", s:{shika:2, rakko:1}},
+      {t:"デスクに座りっぱなしで、ほとんど動かない", s:{rakko:2, neko:1}},
+      {t:"座り時間は長いけれど、運動する習慣がある", s:{uma:2}},
+      {t:"移動も運動も少なめ。ゆったり過ごしている", s:{neko:2}}
+    ]
+  },
+  {
+    q:"体温と、めぐりの話。<br>近いのはどれ？",
+    a:[
+      {t:"汗をかきやすくて、どちらかといえば暑がり", s:{uma:2, shika:1}},
+      {t:"顔はほてるのに、脚だけひんやりしている", s:{rakko:2, neko:1}},
+      {t:"一年中、手足が冷たい", s:{neko:2}},
+      {t:"疲れた日は、脚が重だるくなる", s:{rakko:2, shika:1}}
+    ]
+  },
+  {
+    q:"今夜、自分に許すご褒美は？",
+    a:[
+      {t:"湯船でしっかり温まって、ストレッチ", s:{shika:2, uma:1}},
+      {t:"脚を高くして、ソファでだらり", s:{rakko:2}},
+      {t:"温かい飲みものと、ブランケット", s:{neko:2}},
+      {t:"軽く体を動かして、すっきりしてから眠る", s:{uma:2}}
+    ]
+  }
+];
+
+/* ─────────── 4タイプ ─────────── */
+const TYPES = {
+  shika:{
+    key:"shika", emoji:"🦌", name:"シカタイプ", en:"DEER",
+    sub:"がんばりやの、カチコチ筋肉脚",
+    catch:"よく歩いた日の脚は、<br>ちゃんと硬くなる。",
+    traits:["ふくらはぎが硬い","前ももが張りやすい","立ち仕事・よく歩く","湯上がりはラクになる"],
+    desc:"動いた分だけ、筋肉がしっかり働いている脚。太いのではなく「張っている」のがあなたのタイプです。硬くなった筋肉はめぐりの通り道をふさぐので、放っておくと張りが翌朝まで居座ります。鍛えるより、ゆるめる。それがシカタイプの正解です。",
+    care:[
+      ["温めてから、はじめる","冷えた筋肉は伸びません。湯船か蒸しタオルで温めたあとに触るのが鉄則。"],
+      ["ふくらはぎを、外側から","アキレス腱から膝裏へ、親指ではなく手のひら全体で。硬い外側を重点的にほぐします。"],
+      ["前ももと足裏で仕上げ","前ももを上下にさすり、最後に足裏を親指で押す。ここを抜くと張りが戻ります。"]
+    ],
+    story:{
+      h:"がんばった脚には、<br>ほどく時間がいる。",
+      p:"硬い脚に必要なのは、力ではなく「すべり」。摩擦のあるまま手でこすると、皮膚が先に負けてしまいます。ほぐほぐクリームは、指が最後までなめらかに走るテクスチャー。だから深いところまで、痛くなくたどり着ける。",
+      q:"今日より明日、もっとスッキリ。<br>それが、この一本の役目です。"
+    },
+    share:"私は【シカタイプ🦌】でした。\nよく動いた日ほど、脚がカチコチになるタイプ。\n今夜はちゃんとほぐしてから寝ます。"
+  },
+  rakko:{
+    key:"rakko", emoji:"🦦", name:"ラッコタイプ", en:"OTTER",
+    sub:"ためこみやすい、ふんわりむくみ脚",
+    catch:"太ったんじゃない。<br>今日の分を、抱えているだけ。",
+    traits:["夕方に靴下の跡","押すとへこむ","座り時間が長い","朝と夜で脚が違う"],
+    desc:"脂肪ではなく水分。朝はすっきりしているのに、夕方には別の脚になっている——それがラッコタイプのいちばんの特徴です。原因は動かない時間の長さ。めぐりは筋肉のポンプで動くので、座りっぱなしだと水分が下にとどまります。裏を返せば、その日のうちに流せば、翌朝はちゃんと戻ります。",
+    care:[
+      ["足首から、上へ","むくみは下から上へ流すのが原則。足首をつかんで、膝裏に向かってゆっくり押し上げます。"],
+      ["膝裏を、10秒","流したものの出口は膝裏。ここを両手の指で軽く押さえて10秒。ここを通さないと戻ってきます。"],
+      ["壁に脚を上げて3分","仕上げは重力にまかせる時間。スマホを見ながらで大丈夫。毎晩やると翌朝が変わります。"]
+    ],
+    story:{
+      h:"ためこまない習慣を、<br>ひとつだけ持つ。",
+      p:"むくみケアの難しさは、続かないこと。疲れて帰った夜に、10分のマッサージは正直しんどい。だから「塗るついでに流す」に変えてしまうのがいちばん早いんです。ほぐほぐクリームは、脚に伸ばす3分がそのままケアになる設計。",
+      q:"今日ためこんだものは、今日のうちに。"
+    },
+    share:"私は【ラッコタイプ🦦】でした。\n太ったんじゃなくて、今日の分をためこんでるだけらしい。\n夜にちゃんと流します。"
+  },
+  neko:{
+    key:"neko", emoji:"🐈", name:"ネコタイプ", en:"CAT",
+    sub:"めぐりが眠っている、華奢冷え脚",
+    catch:"細いのに、軽くない。<br>それは冷えのせいかも。",
+    traits:["一年中、手足が冷たい","筋肉が少なめ","脚は細いのに疲れる","運動習慣は少なめ"],
+    desc:"細さは長所。でもネコタイプの本当のテーマは、太さではなく温度です。筋肉が少ないと熱をつくる力とめぐらせる力がどちらも弱く、脚の末端に血が届きにくくなります。細いのにだるい、細いのに夕方きつい、の正体はここ。冷やさないこと、そして「動かす」より「温めて動かす」が効きます。",
+    care:[
+      ["足首をまわす、10回ずつ","いきなり強く揉まないこと。まずは足首をゆっくり回して、めぐりのスイッチを入れます。"],
+      ["ふくらはぎを、手のひらで包む","もむのではなく包んで温める。手の熱が伝わるくらいの、やさしい圧で十分です。"],
+      ["最後に、太ももの内側","冷えが最後まで残るのは内もも。下から上へ、なでるようにゆっくり流します。"]
+    ],
+    story:{
+      h:"やさしい圧で、<br>じゅうぶん届く。",
+      p:"力の弱い人ほど、クリームの伸びが効いてきます。手のひらで包んで滑らせるだけで、温度と圧が一緒に伝わるから。冷えは一日で消えるものではないけれど、毎晩の3分は確実に積み上がります。",
+      q:"温めることは、いちばん静かな投資。"
+    },
+    share:"私は【ネコタイプ🐈】でした。\n細いのに疲れる理由、冷えだったらしい、、、\n今夜からちゃんと温めます。"
+  },
+  uma:{
+    key:"uma", emoji:"🐎", name:"ウマタイプ", en:"HORSE",
+    sub:"バランスのいい、メリハリ立体脚",
+    catch:"整っている脚ほど、<br>キープが仕事になる。",
+    traits:["ほどよい弾力がある","むくみは残りにくい","動く習慣がある","ラインにメリハリ"],
+    desc:"筋肉と柔らかさのバランスが取れた、いちばん良い状態にある脚。……なのですが、ウマタイプの落とし穴は「困っていないから何もしない」こと。この状態は体質ではなく、今の生活習慣がつくっているものです。座り時間が増えたり、運動が止まった月から、静かに崩れます。守りのケアに切り替えるのが正解。",
+    care:[
+      ["毎日ではなく、毎晩の1分","長くやる必要はありません。短くても切らさないことがキープの条件です。"],
+      ["裏側だけ、意識して","前ももは使えているので、忘れられがちな裏もも・ふくらはぎ裏を下から上へ。"],
+      ["月に一度、写真を撮る","変化は自分では見えません。同じ角度で記録しておくと、崩れる前に気づけます。"]
+    ],
+    story:{
+      h:"崩れてから戻すより、<br>崩さないほうが早い。",
+      p:"ケアが続かない理由のほとんどは「面倒だから」。だから道具は一本でいい。ほぐほぐクリームは、お風呂上がりに手に取るところまでが習慣になる位置に置いておく——それだけで1分のケアが毎晩成立します。",
+      q:"いい状態を、明日も同じように。"
+    },
+    share:"私は【ウマタイプ🐎】でした。\nバランス型らしいけど、油断すると崩れるタイプ。\nキープしていきます。"
+  }
+};
+const ORDER = ["rakko","shika","neko","uma"];
+
+/* ─────────── ロジック ─────────── */
+function score(answers){
+  const sum = {shika:0, rakko:0, neko:0, uma:0};
+  answers.forEach((ai, qi) => {
+    const s = QUESTIONS[qi].a[ai].s;
+    for (const k in s) sum[k] += s[k];
+  });
+  let best = ORDER[0];
+  ORDER.forEach(k => { if (sum[k] > sum[best]) best = k; });
+  // 同点は Q2（脚の質感）の回答を優先
+  const top = ORDER.filter(k => sum[k] === sum[best]);
+  if (top.length > 1) {
+    const q2 = QUESTIONS[1].a[answers[1]].s;
+    const hit = top.find(k => q2[k]);
+    if (hit) best = hit;
+  }
+  return {type:TYPES[best], sum};
+}
+
+/* ─────────── 画面制御 ─────────── */
+const $ = id => document.getElementById(id);
+const answers = [];
+let cur = 0;
+
+function show(id){
+  document.querySelectorAll(".screen").forEach(el => el.classList.remove("is-on"));
+  $(id).classList.add("is-on");
+  window.scrollTo({top:0, behavior:"instant" in window ? "instant" : "auto"});
+}
+
+function buildDots(){
+  $("dots").innerHTML = QUESTIONS.map(() => '<span class="dot"></span>').join("");
+}
+function paintDots(){
+  document.querySelectorAll("#dots .dot").forEach((d,i) => d.classList.toggle("done", i <= cur));
+}
+
+function renderQ(){
+  const q = QUESTIONS[cur];
+  $("q-no").textContent = "Q" + (cur + 1);
+  $("q-text").innerHTML = q.q;
+  $("opts").innerHTML = q.a.map((o,i) =>
+    `<button class="opt" data-i="${i}">${o.t}</button>`).join("");
+  document.querySelectorAll(".opt").forEach(b => {
+    b.addEventListener("click", () => pick(parseInt(b.dataset.i, 10), b));
+  });
+  $("back").style.visibility = cur === 0 ? "hidden" : "visible";
+  paintDots();
+}
+
+function pick(i, el){
+  el.classList.add("picked");
+  answers[cur] = i;
+  setTimeout(() => {
+    if (cur < QUESTIONS.length - 1){ cur++; renderQ(); }
+    else { renderResult(); }
+  }, 260);
+}
+
+function renderResult(){
+  const {type:t} = score(answers);
+  $("r-emoji").textContent = t.emoji;
+  $("r-name").textContent = t.name;
+  $("r-sub").textContent = t.sub;
+  $("r-catch").innerHTML = t.catch;
+  $("r-traits").innerHTML = t.traits.map(x => `<li>${x}</li>`).join("");
+  $("r-desc").textContent = t.desc;
+  $("r-care").innerHTML = t.care.map(c => `<li><b>${c[0]}</b>${c[1]}</li>`).join("");
+  $("r-story-h").innerHTML = t.story.h;
+  $("r-story-p").textContent = t.story.p;
+  $("r-story-q").innerHTML = t.story.q;
+  $("cta").href = SHOP_URL;
+  $("r-others").innerHTML = ORDER.filter(k => k !== t.key).map(k => {
+    const o = TYPES[k];
+    return `<li><span class="e">${o.emoji}</span><b>${o.name}</b>${o.sub}</li>`;
+  }).join("");
+  $("share-text").textContent = shareText(t);
+  show("s-result");
+}
+
+function shareText(t){
+  return `${t.share}\n\n#ChenMeの脚トリセツ #脚タイプ診断 #ほぐほぐクリーム #ナイトルーティン\n${SITE_URL}`;
+}
+
+function toast(msg){
+  const el = $("toast");
+  el.textContent = msg;
+  el.classList.add("on");
+  setTimeout(() => el.classList.remove("on"), 1800);
+}
+
+/* ─────────── イベント ─────────── */
+$("start").addEventListener("click", () => { cur = 0; answers.length = 0; renderQ(); show("s-quiz"); });
+$("back").addEventListener("click", () => { if (cur > 0){ cur--; renderQ(); } });
+$("retry").addEventListener("click", () => { cur = 0; answers.length = 0; show("s-intro"); });
+
+$("share-x").addEventListener("click", () => {
+  const t = score(answers).type;
+  const url = "https://twitter.com/intent/tweet?text=" + encodeURIComponent(shareText(t));
+  window.open(url, "_blank", "noopener");
+});
+
+$("share-copy").addEventListener("click", async () => {
+  const txt = $("share-text").textContent;
+  try {
+    if (navigator.share && /iPhone|iPad|Android/i.test(navigator.userAgent)) {
+      await navigator.share({text: txt});
+      return;
+    }
+    await navigator.clipboard.writeText(txt);
+    toast("コピーしました");
+  } catch(e) {
+    const ta = document.createElement("textarea");
+    ta.value = txt; document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); toast("コピーしました"); }
+    catch(_) { toast("長押しでコピーしてください"); }
+    ta.remove();
+  }
+});
+
+/* ─────────── 花びら ─────────── */
+(function petals(){
+  const mm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)");
+  if (mm && mm.matches) return;
+  const box = $("petals");
+  for (let i = 0; i < 9; i++){
+    const p = document.createElement("span");
+    p.className = "petal";
+    p.style.left = (Math.random() * 96) + "%";
+    p.style.animationDuration = (16 + Math.random() * 14) + "s";
+    p.style.animationDelay = (-Math.random() * 20) + "s";
+    p.style.transform = "scale(" + (0.6 + Math.random() * 0.7) + ")";
+    box.appendChild(p);
+  }
+})();
+
+buildDots();
+</script>
+</body>
+</html>
