@@ -88,13 +88,8 @@ body{
   border:1.5px solid var(--line);border-radius:26px;overflow:hidden;
   background:linear-gradient(172deg,#FFFFFF 0%,#FCF4EF 52%,#F8E6EA 100%);
 }
-.hero-card .glow{
-  position:absolute;left:50%;top:54%;width:270px;height:270px;transform:translate(-50%,-50%);
-  border-radius:50%;background:radial-gradient(circle,rgba(247,221,227,.95),rgba(247,221,227,0) 70%);
-}
 .hero-card .cr{position:absolute;bottom:4px;right:12px;filter:drop-shadow(0 4px 10px rgba(88,74,78,.28))}
 .emb{display:block;border-radius:50%;filter:drop-shadow(0 3px 8px rgba(88,74,78,.18))}
-.hero-card .cd{position:absolute;top:16px;left:16px;z-index:2;text-shadow:0 1px 6px rgba(255,255,255,.8);font-family:"Cormorant Garamond",serif;font-style:italic;font-size:12px;letter-spacing:.3em;color:var(--gold)}
 .figure{
   display:block;width:100%;height:auto;            /* 切り抜かない。元の正方形のまま出す */
   border-radius:20px;border:1px solid rgba(255,255,255,.7);
@@ -213,6 +208,7 @@ body{
 .rtype{text-align:center;margin-top:6px}
 .rtype .code{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:13px;letter-spacing:.34em;color:var(--gold);font-weight:600}
 .rtype h2{font-family:var(--serif);font-weight:800;font-size:26px;line-height:1.4;margin:4px 0 6px}
+.rtype .tcode{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:11.5px;letter-spacing:.3em;color:var(--gold);margin:2px 0 7px}
 .rtype .catch{font-size:12.5px;color:var(--plum-soft);line-height:1.7;margin:0}
 .card{background:#fff;border:1.5px solid var(--line);border-radius:var(--r);padding:15px;margin-top:15px}
 .card h3{font-family:var(--serif);font-size:13px;letter-spacing:.1em;margin:0 0 11px;display:flex;align-items:center;gap:7px}
@@ -671,12 +667,11 @@ function renderResult(){
   var r=result, ty=TYPES[r.code][LANG], m=matchOf(r.code), mt=TYPES[m][LANG];
   screen.innerHTML =
    '<div class="pad fadein">'+
-    '<div class="hero-card"><div class="glow"></div>'+
-      '<span class="cd">'+r.code+'</span><span class="cr">'+icon(r.code,52)+'</span>'+
-      figureTag(r.code)+
+    '<div class="hero-card">'+ figureTag(r.code) +
+      '<span class="cr">'+icon(r.code,52)+'</span>'+
     '</div>'+
     '<div class="rtype" style="margin-top:12px"><div class="code">'+L("resultTitle")+'</div>'+
-      '<h2>'+esc(ty.n)+'</h2><p class="catch">'+esc(ty.c)+'</p>'+
+      '<h2>'+esc(ty.n)+'</h2><div class="tcode">'+r.code+'</div><p class="catch">'+esc(ty.c)+'</p>'+
       '<div class="tagline"><span>'+esc(ty.m)+'</span><span>'+esc(ty.s)+'</span></div></div>'+
     '<div class="bubble"><b class="who">'+L("naruSays")+'</b>'+esc(ty.t).replace(/\n/g,"<br>")+'</div>'+
     '<div class="card"><h3>'+L("axisTitle")+'</h3>'+
