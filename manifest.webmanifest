@@ -1,0 +1,16 @@
+{
+  "name": "美脚の魔女図鑑",
+  "short_name": "魔女図鑑",
+  "description": "12の質問であなたの脚のクセを診断。16人の魔女から、あなたの中の1人を見つけます。",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FDFAF8",
+  "theme_color": "#FDFAF8",
+  "icons": [
+    { "src": "app-icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "app-icon.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
