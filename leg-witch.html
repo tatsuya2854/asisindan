@@ -493,6 +493,11 @@ u{text-decoration:none}
   line-height:1.65;color:var(--plum);text-align:center;
 }
 .runs{font-size:10.5px;font-weight:800;letter-spacing:.08em;color:var(--gold);text-align:center;margin:10px 0 0}
+.privacy{
+  font-size:9.5px;line-height:1.7;color:var(--plum-soft);text-align:center;
+  margin:18px 4px 0;opacity:.8;
+}
+.privacy a{color:var(--plum-soft);text-decoration:underline;text-underline-offset:2px}
 
 /* マイルストーン用トースト（少し大きめ） */
 .toast.big{font-family:var(--serif);font-size:14px;padding:12px 22px}
@@ -599,6 +604,8 @@ var T = {
     friendBanner:"シェアされた結果を見ています。<br>あなたの魔女も探してみて。",
     meToo:"わたしも診断する",
     runsLabel:"{n}回目の診断", half:"折り返し！のこり6問",
+    privacy:"アクセス解析のためGoogleアナリティクス（Cookie）を使用しています。",
+    privacyLink:"データの扱いについて",
     lastQ:"さいごの1問", almost:"あと{n}問",
     saveImg:"画像を保存", shareImg:"シェアする", making:"カードを作っています…",
     savedImg:"画像を保存しました", shareFail:"保存できませんでした",
@@ -640,6 +647,8 @@ var T = {
     friendBanner:"You are viewing a shared result.<br>Go find your own witch.",
     meToo:"Take the reading myself",
     runsLabel:"Reading no. {n}", half:"Halfway — six to go",
+    privacy:"This site uses Google Analytics cookies to measure usage.",
+    privacyLink:"How your data is used",
     lastQ:"Last question", almost:"{n} to go",
     saveImg:"Save image", shareImg:"Share", making:"Building your card…",
     savedImg:"Image saved", shareFail:"Could not save",
@@ -1111,6 +1120,9 @@ function renderIntro(){
      '<button class="ghost" id="codexBtn">'+L("codex")+'</button>'+
      collectBar()+
      (runs>0 ? '<p class="runs">'+L("runsLabel").replace("{n}",runs)+'</p>' : '')+
+     '<p class="privacy">'+L("privacy")+'<br>'+
+       '<a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer">'+
+       L("privacyLink")+'</a></p>'+
    '</div></div>';
   $("startBtn").onclick=beginQuiz;
   $("codexBtn").onclick=function(){ track("codex"); Music.sfx("tap"); renderCodex(); };
