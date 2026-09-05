@@ -1,30 +1,33 @@
 美脚の魔女図鑑
 
-公開URL： https://tatsuya2854.github.io/asisindan/
+公開URL： https://bikyakusindan.toropicanafanta.workers.dev/
 
 ―――――――――――――――――――――――――――――――
-GitHub Pages の設定（最初の1回だけ）
+デプロイについて
 ―――――――――――――――――――――――――――――――
-1. https://github.com/tatsuya2854/asisindan/settings/pages を開く
-2. Build and deployment → Source を「Deploy from a branch」にする
-3. Branch を「main」／フォルダは「/ (root)」を選んで Save
+・Cloudflare Workers（プロジェクト名 bikyakusindan）に繋がっています。
+・main に push すると自動でビルド＆公開されます。設定は不要です。
+・ビルド状況： GitHub の main のコミットに付く
+  「Workers Builds: bikyakusindan」のチェックで見られます。
 
-1〜2分で上のURLで見られるようになります。
-以降は main に push するたび自動で反映されます。
+・GitHub Pages は使っていません（有効にしていません）。
+  同じ中身が2つのURLで見られる状態は事故のもとなので、
+  公開先は Cloudflare の1本に寄せています。
 
 ―――――――――――――――――――――――――――――――
 ファイル構成
 ―――――――――――――――――――――――――――――――
 このフォルダの中身を、まるごと同じ階層に置いてください。
 
-  index.html            ← ページ本体（Pagesはこれを最初に開く）
+  index.html            ← ページ本体（これが最初に開かれます）
   leg-witch.html        ← index.html と中身は同じ（どちらで開いてもOK）
   ogp.jpg               ← X / LINE にリンクを貼ったときに出るカード画像
   manifest.webmanifest  ← ホーム画面に追加したときの設定
   app-icon.png          ← ホーム画面のアイコン
   img/                  ← イラスト16枚（結果・詳細・シェアカード用）
   img/t/                ← サムネイル16枚（図鑑の一覧用）
-  .nojekyll             ← Pagesの余計な変換を止めるための空ファイル
+  .nojekyll             ← GitHub Pages に切り替えたくなったとき用の空ファイル
+                           （Cloudflareでは無害。消しても動きます）
 
 ・フォルダ構成を変えなければ、そのまま動きます。
 ・画像を差し替えたときは img フォルダごと入れ替えてください。
@@ -62,9 +65,11 @@ OGP画像を差し替えるとき
 ―――――――――――――――――――――――――――――――
 ・ogp.jpg を 1200x630 の画像に置き換えるだけです。
 ・URLは index.html に絶対パスで書いてあります。独自ドメインに移すときは
-  index.html の中の
-    https://tatsuya2854.github.io/asisindan/
+  index.html と leg-witch.html の中の
+    https://bikyakusindan.toropicanafanta.workers.dev/
   を新しいURLに一括置換してください（og:url / og:image / twitter:image /
   canonical の4か所）。
+・シェアカードに載るURLは location から自動で取るので、こちらの書き換えは
+  不要です。長いドメインでも文字サイズが自動で縮んで収まります。
 ・XやLINEは画像をキャッシュします。差し替えても古い画像が出るときは
   X の Card Validator などでキャッシュを更新してください。

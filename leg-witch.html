@@ -17,16 +17,16 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="美脚の魔女図鑑">
 <meta property="og:locale" content="ja_JP">
-<meta property="og:url" content="https://tatsuya2854.github.io/asisindan/">
-<meta property="og:image" content="https://tatsuya2854.github.io/asisindan/ogp.jpg">
+<meta property="og:url" content="https://bikyakusindan.toropicanafanta.workers.dev/">
+<meta property="og:image" content="https://bikyakusindan.toropicanafanta.workers.dev/ogp.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="美脚の魔女図鑑">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="美脚の魔女図鑑｜16人の魔女、あなたはどれ？">
 <meta name="twitter:description" content="12の質問であなたの脚のクセを診断。16人の魔女から、あなたの中の1人を見つけます。">
-<meta name="twitter:image" content="https://tatsuya2854.github.io/asisindan/ogp.jpg">
-<link rel="canonical" href="https://tatsuya2854.github.io/asisindan/">
+<meta name="twitter:image" content="https://bikyakusindan.toropicanafanta.workers.dev/ogp.jpg">
+<link rel="canonical" href="https://bikyakusindan.toropicanafanta.workers.dev/">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -485,8 +485,9 @@ u{text-decoration:none}
 
 /* シェアカードの足元（QRをやめて、URLの文字にした） */
 .shot .site{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:9.5px;
-  letter-spacing:.1em;color:var(--plum-soft);text-align:right;line-height:1.45;max-width:47%;
-  word-break:break-all}
+  letter-spacing:.04em;color:var(--plum-soft);text-align:right;line-height:1.45;
+  min-width:0;flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.shot .foot .tag{flex:0 0 auto}
 .shot .rarechip{
   display:inline-flex;align-items:center;gap:5px;margin:9px auto 0;background:rgba(255,255,255,.8);
   border:1px solid var(--champagne);border-radius:99px;padding:3px 10px;font-size:9.5px;font-weight:800;
@@ -1301,6 +1302,11 @@ function openDetail(code){
 function shareURL(code){
   return location.href.split("#")[0] + "#w=" + code;
 }
+/* カードに刷る用。ドメインだけ。長いドメインでも1行に収まる */
+function siteLabel(){
+  try{ return location.host + (location.pathname==="/" ? "" : location.pathname).replace(/\/$/,""); }
+  catch(e){ return ""; }
+}
 
 function openShare(){
   var r=result, ty=TYPES[r.code][LANG], lv=rarityLv(r.code);
@@ -1317,7 +1323,7 @@ function openShare(){
      '<p class="cat2">'+esc(ty.c)+'</p>'+
      '<div class="bars">'+bars+'</div>'+
      '<div class="foot"><span class="tag">'+L("tag")+'<span>'+L("resultTitle")+'</span></span>'+
-       '<span class="site">'+esc(shareURL(r.code).replace(/^https?:\/\//,""))+'</span>'+
+       '<span class="site">'+esc(siteLabel())+'</span>'+
      '</div>'+
    '</div></div>'+
    '<p class="hint" id="shotHint">'+L("shotHintNew")+'</p>'+
@@ -1455,9 +1461,25 @@ function buildCard(code){
     c.fillText(L("tag"), pad, fy);
     c.fillStyle="rgba(88,74,78,.6)"; c.font='700 25px '+rnd;
     c.fillText(L("resultTitle"), pad, fy+40);
+    /* ドメインが長いとハッシュタグと重なるので、入る大きさまで自動で縮める。
+       それでも入らなければ #w=... を落としてドメインだけにする */
+    var tagW = (c.font='800 40px '+ser, c.measureText(L("tag")).width);
+    var room = iw - tagW - 40;
+    var site = siteLabel();
+    var fs = 26;
+    c.font='italic 600 '+fs+'px "Cormorant Garamond",Georgia,serif';
+    while(c.measureText(site).width > room && fs > 17){
+      fs -= 1; c.font='italic 600 '+fs+'px "Cormorant Garamond",Georgia,serif';
+    }
+    if(c.measureText(site).width > room){
+      site = site.split("#")[0];
+      fs = 22; c.font='italic 600 '+fs+'px "Cormorant Garamond",Georgia,serif';
+      while(c.measureText(site).width > room && fs > 14){
+        fs -= 1; c.font='italic 600 '+fs+'px "Cormorant Garamond",Georgia,serif';
+      }
+    }
     c.textAlign="right"; c.fillStyle="rgba(88,74,78,.58)";
-    c.font='italic 600 26px "Cormorant Garamond",Georgia,serif';
-    c.fillText(shareURL(code).replace(/^https?:\/\//,""), W-pad, fy+22);
+    c.fillText(site, W-pad, fy+22);
 
     return new Promise(function(res,rej){
       try{ cv.toBlob(function(bl){ bl?res(bl):rej(new Error("no blob")); }, "image/png", 0.95); }
