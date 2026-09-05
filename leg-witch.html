@@ -159,7 +159,7 @@ body{
 
 /* キャラ詳細 */
 .detail{
-  width:100%;max-width:340px;background:linear-gradient(172deg,#FFFFFF,#FCF3EF 55%,#F8E6EA);
+  flex:0 0 auto;width:100%;max-width:340px;background:linear-gradient(172deg,#FFFFFF,#FCF3EF 55%,#F8E6EA);
   border-radius:24px;padding:16px 16px 18px;text-align:center;position:relative;
   animation:up .35s cubic-bezier(.2,1.2,.4,1);
 }
@@ -284,9 +284,10 @@ body{
 @keyframes fade{from{opacity:0}}
 .sheet-in{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
   display:flex;flex-direction:column;align-items:center;
-  padding:calc(62px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom))}
+  padding:calc(62px + env(safe-area-inset-top)) 16px 0}
 .shot{
   width:100%;max-width:322px;border-radius:22px;overflow:hidden;position:relative;
+  flex:0 0 auto;
   background:linear-gradient(168deg,#FFFFFF 0%,#FDF4F2 46%,#F8E3E7 100%);
   box-shadow:0 18px 46px rgba(0,0,0,.32);
   animation:up .4s cubic-bezier(.2,1.2,.4,1);
@@ -314,8 +315,16 @@ body{
 .shot .tag{font-family:var(--serif);font-weight:800;font-size:11px;letter-spacing:.04em;text-align:left}
 .shot .tag span{display:block;font-size:8.5px;letter-spacing:.12em;color:var(--plum-soft);font-family:var(--round);font-weight:700;margin-top:1px}
 .shot .qr{width:30px;height:30px;flex:0 0 auto}
-.hint{color:#fff;font-size:11.5px;font-weight:700;margin:13px 0 10px;text-align:center;opacity:.92;line-height:1.7}
-.srow{display:flex;gap:8px;width:100%;max-width:322px}
+/* 操作部はシート下部に貼り付ける。カードが長いので、
+   短い端末だと「画像を保存」が画面外に出てしまう */
+.sactions{
+  position:sticky;bottom:0;z-index:3;flex:0 0 auto;
+  width:100%;max-width:322px;margin-top:auto;
+  padding:14px 0 calc(4px + env(safe-area-inset-bottom));
+  background:linear-gradient(to top,rgba(88,74,78,.94) 58%,rgba(88,74,78,0));
+}
+.hint{flex:0 0 auto;color:#fff;font-size:11.5px;font-weight:700;margin:0 0 10px;text-align:center;opacity:.92;line-height:1.7}
+.srow{flex:0 0 auto;display:flex;gap:8px;width:100%;max-width:322px}
 .srow button,.srow a{
   flex:1;appearance:none;border:0;cursor:pointer;text-decoration:none;text-align:center;
   border-radius:14px;padding:12px 4px;font-family:var(--round);font-weight:800;font-size:12px;
@@ -1719,12 +1728,14 @@ function openShare(){
        '<span class="qrbox" id="qrBox"></span>'+
      '</div>'+
    '</div></div>'+
-   '<p class="hint" id="shotHint">'+L("shotHintNew")+'</p>'+
-   '<div class="srow" style="margin-bottom:8px"><button class="sv" id="svBtn">'+
-     (canWebShare() ? L("shareImg") : L("saveImg"))+'</button></div>'+
-   '<div class="srow"><a class="x" id="xBtn" target="_blank" rel="noopener">'+L("shareX")+'</a>'+
-     '<button class="cp" id="cpBtn">'+L("copy")+'</button>'+
-     '<button class="cl" id="clBtn">'+L("close")+'</button></div>';
+   '<div class="sactions">'+
+     '<p class="hint" id="shotHint">'+L("shotHintNew")+'</p>'+
+     '<div class="srow" style="margin-bottom:8px"><button class="sv" id="svBtn">'+
+       (canWebShare() ? L("shareImg") : L("saveImg"))+'</button></div>'+
+     '<div class="srow"><a class="x" id="xBtn" target="_blank" rel="noopener">'+L("shareX")+'</a>'+
+       '<button class="cp" id="cpBtn">'+L("copy")+'</button>'+
+       '<button class="cl" id="clBtn">'+L("close")+'</button></div>'+
+   '</div>';
   var text=L("shareText").replace("{name}", ty.n).replace("{catch}", ty.c);
   var url=shareURL(r.code);
   $("xBtn").href="https://twitter.com/intent/tweet?text="+encodeURIComponent(text)+"&url="+encodeURIComponent(url);
