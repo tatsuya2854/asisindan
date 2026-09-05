@@ -367,13 +367,38 @@ body{
 /* 計算中：魔法陣がゆっくり閉じていく */
 .calc{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;gap:0;padding:0 26px}
 .calc .circle{position:relative;width:186px;height:186px;display:grid;place-items:center}
+/* 絵そのものは回さない。中央の「?」が一緒に傾いて、
+   むしろ壊れて見えていた（魔法陣は左右対称なので回転が伝わらない）。
+   絵は呼吸させるだけにして、動きは上に重ねたリングと光の走査で見せる。 */
 .calc .circle img{width:100%;height:100%;object-fit:contain;border-radius:50%;
-  animation:swirl 7s linear infinite;filter:saturate(1.1)}
+  animation:mpulse 2.6s ease-in-out infinite}
+@keyframes mpulse{
+  0%,100%{transform:scale(1);filter:saturate(1.02) brightness(1)}
+  50%{transform:scale(1.035);filter:saturate(1.16) brightness(1.07)}
+}
 @keyframes swirl{to{transform:rotate(360deg)}}
-.calc .ring{position:absolute;inset:0;border-radius:50%;border:1.5px dashed rgba(217,154,171,.55);
-  animation:swirlBack 11s linear infinite}
-.calc .ring.b{inset:16px;border-style:solid;border-color:rgba(160,135,112,.3);animation-duration:8s}
 @keyframes swirlBack{to{transform:rotate(-360deg)}}
+
+.calc .ring{position:absolute;inset:-10px;border-radius:50%;
+  border:1.5px dashed rgba(217,154,171,.75);animation:swirl 6s linear infinite}
+.calc .ring.b{inset:6px;border:1.5px dashed rgba(160,135,112,.5);
+  animation:swirlBack 9s linear infinite}
+/* 短い弧を2本、逆向きに回す。ここが「回っている」の主役 */
+.calc .ring.c{inset:-20px;border:2px solid transparent;
+  border-top-color:var(--pink-d);border-right-color:rgba(217,154,171,.35);
+  animation:swirl 1.9s cubic-bezier(.5,0,.5,1) infinite}
+.calc .ring.d{inset:16px;border:2px solid transparent;
+  border-bottom-color:var(--gold);animation:swirlBack 2.7s linear infinite}
+/* 光の走査。中央はくり抜くので「?」は隠れない */
+@supports ((mask:radial-gradient(#000,#000)) or (-webkit-mask:radial-gradient(#000,#000))){
+  .calc .sweep{
+    position:absolute;inset:-10px;border-radius:50%;pointer-events:none;mix-blend-mode:screen;
+    background:conic-gradient(from 0deg,rgba(255,255,255,0) 0deg,rgba(255,244,224,.9) 24deg,rgba(255,255,255,0) 58deg);
+    -webkit-mask:radial-gradient(circle,transparent 43%,#000 47%,#000 99%,transparent 100%);
+            mask:radial-gradient(circle,transparent 43%,#000 47%,#000 99%,transparent 100%);
+    animation:swirl 2.2s linear infinite;
+  }
+}
 .calc .glow{position:absolute;inset:-18px;border-radius:50%;pointer-events:none;
   background:radial-gradient(circle,rgba(255,232,214,.85),rgba(255,232,214,0) 62%);
   animation:breathe 2.1s ease-in-out infinite}
@@ -1088,7 +1113,9 @@ function renderCalc(){
     '<div class="calc">'+
       '<div class="circle"><div class="glow"></div>'+
         '<img src="'+MANDALA+'" alt="" aria-hidden="true">'+
+        '<div class="sweep"></div>'+
         '<div class="ring"></div><div class="ring b"></div>'+
+        '<div class="ring c"></div><div class="ring d"></div>'+
       '</div>'+
       '<p id="calcLine"><span class="line">'+L("calc")+'</span></p>'+
       '<div class="cbar"><i id="calcBar"></i></div>'+
