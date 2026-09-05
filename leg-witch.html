@@ -28,6 +28,15 @@
 <meta name="twitter:image" content="https://bikyakusindan.toropicanafanta.workers.dev/ogp.jpg">
 <link rel="canonical" href="https://bikyakusindan.toropicanafanta.workers.dev/">
 <link rel="manifest" href="manifest.webmanifest">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-N1FTJ40NZJ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-N1FTJ40NZJ');
+</script>
+<link rel="preconnect" href="https://www.googletagmanager.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&family=Zen+Maru+Gothic:wght@500;700;900&family=Cormorant+Garamond:ital,wght@1,600&display=swap" rel="stylesheet">
@@ -1077,7 +1086,7 @@ var Music = (function(){
    ============================================================ */
 function beginQuiz(){
   answers=[]; picked=[]; friendMode=false; step=0;
-  track("start", {run: runs+1});
+  track("start", {run_no: runs+1});
   Music.sfx("open"); buzz(12);
   if(location.hash) { try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} }
   renderQ();
@@ -1133,7 +1142,7 @@ var ORNAMENT = '<img class="mandala" src="' + MANDALA + '" alt="" aria-hidden="t
 
 function renderQ(){
   if(step<0 || step>=Q.length){ renderIntro(); return; }
-  track("q", {n: step+1});          /* どの設問で落ちているかを見るため */
+  track("q", {q_no: step+1});       /* どの設問で落ちているかを見るため */
   var q=Q[step], t=q[LANG];
   /* 回答ずみの数で出す。最後の1問に答えると 100% まで伸びる */
   var pct=Math.round(step/Q.length*100);
@@ -1221,7 +1230,7 @@ function renderCalc(){
     result=pre; runs++;
     var isNew = seen.indexOf(result.code)<0;
     if(isNew) seen.push(result.code);
-    track("complete", {code: result.code, rarity: rarityLv(result.code), isNew: isNew?1:0, seen: seen.length});
+    track("complete", {code: result.code, rarity: rarityLv(result.code), is_new: isNew?1:0, seen_count: seen.length});
     persist({lang:LANG, code:result.code, pct:result.pct, runs:runs, seen:seen});
     renderResult(false, isNew);
   }, total+320));
