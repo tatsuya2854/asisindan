@@ -14,6 +14,16 @@
 <meta name="apple-mobile-web-app-title" content="魔女図鑑">
 <meta property="og:title" content="美脚の魔女図鑑">
 <meta property="og:description" content="16人の魔女、あなたはどれ？">
+<meta property="og:type" content="website">
+<meta property="og:image" content="ogp.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="美脚の魔女図鑑">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="美脚の魔女図鑑｜16人の魔女、あなたはどれ？">
+<meta name="twitter:description" content="12の質問であなたの脚のクセを診断。16人の魔女から、あなたの中の1人を見つけます。">
+<meta name="twitter:image" content="ogp.jpg">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&family=Zen+Maru+Gothic:wght@500;700;900&family=Cormorant+Garamond:ital,wght@1,600&display=swap" rel="stylesheet">
@@ -62,7 +72,18 @@ body{
   padding:calc(10px + env(safe-area-inset-top)) 16px 6px;
   display:flex;align-items:center;justify-content:space-between;gap:10px;
 }
-.mark{font-family:var(--serif);font-weight:800;font-size:13px;letter-spacing:.16em}
+.mark{
+  font-family:var(--serif);font-weight:800;font-size:13px;letter-spacing:.16em;
+  background:none;border:0;padding:0;text-align:left;color:inherit;cursor:pointer;
+}
+.mark:active{opacity:.6}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.snd{
+  width:32px;height:32px;border-radius:50%;border:1.5px solid var(--line);background:#fff;
+  cursor:pointer;display:grid;place-items:center;padding:0;
+}
+.snd svg{width:16px;height:16px;display:block}
+.snd[aria-pressed="true"]{background:var(--pink-d);border-color:var(--pink-d)}
 .mark span{display:block;font-family:"Cormorant Garamond",serif;font-style:italic;font-size:10px;letter-spacing:.2em;color:var(--gold);font-weight:600}
 .lang{
   display:flex;border:1.5px solid var(--line);border-radius:99px;overflow:hidden;background:#fff;
@@ -111,14 +132,15 @@ body{
   cursor:pointer;font:inherit;color:inherit;text-align:center;
 }
 .gcell.me{border-color:var(--pink-d);box-shadow:0 6px 18px rgba(217,154,171,.25)}
-.gcell .thumb{position:relative;width:100%;overflow:hidden;background:#F5EBE6;line-height:0}
+.gcell .thumb{display:block;position:relative;width:100%;overflow:hidden;background:#F5EBE6;line-height:0}
 .gcell .thumb img{display:block;width:100%;height:auto;opacity:0;transition:opacity .3s ease}
 .gcell .thumb img.ready{opacity:1}
 .gcell .thumb .badge{
-  position:absolute;top:7px;left:7px;background:var(--pink-d);color:#fff;border-radius:99px;
-  padding:2px 8px;font-size:9px;font-weight:900;letter-spacing:.08em;
+  position:absolute;z-index:2;top:7px;left:7px;background:var(--pink-d);color:#fff;border-radius:99px;
+  padding:3px 9px;font-size:9px;font-weight:900;letter-spacing:.08em;line-height:1.4;
+  box-shadow:0 3px 9px rgba(217,154,171,.5);
 }
-.gcell .cap{padding:8px 6px 10px}
+.gcell .cap{display:block;padding:8px 6px 10px}
 .gcell b{display:block;font-family:var(--serif);font-size:12px;line-height:1.4}
 .gcell i{display:block;font-family:"Cormorant Garamond",serif;font-style:italic;font-size:9px;letter-spacing:.16em;color:var(--gold);margin-top:3px}
 
@@ -193,6 +215,7 @@ body{
 .opt .ic{flex:0 0 auto;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--ivory);border:1.5px solid #F0E4DA}
 .opt .ic svg{width:26px;height:26px;display:block}
 .opt .tx{font-size:13.5px;font-weight:700;line-height:1.5}
+.navrow{display:flex;justify-content:space-between;align-items:center;margin-top:2px}
 .back{
   appearance:none;background:none;border:0;font:inherit;font-size:12px;font-weight:700;
   color:var(--plum-soft);padding:8px 0;cursor:pointer;
@@ -322,7 +345,157 @@ body{
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 .fadein{animation:fi .45s ease both}
 @keyframes fi{from{opacity:0;transform:translateY(10px)}}
-@media (prefers-reduced-motion:reduce){*{animation-duration:.001s!important;transition-duration:.05s!important}}
+
+/* ============================================================
+   演出レイヤー（紙吹雪・きらめき・リビール・レア度・図鑑の進み）
+   ============================================================ */
+.fx{position:absolute;inset:0;z-index:45;pointer-events:none;overflow:hidden}
+/* 落下は top で動かす。vh だとデスクトップ（#app が800px固定）で
+   画面外まで飛んでいって、途中で消えたように見えていた */
+.fx b{position:absolute;top:-8%;display:block;width:8px;height:13px;border-radius:2px;opacity:0;
+  animation:fall var(--dur,2.6s) cubic-bezier(.25,.6,.5,1) forwards}
+@keyframes fall{
+  0%{opacity:0;top:-8%;transform:translate3d(0,0,0) rotate(0)}
+  10%{opacity:1}
+  85%{opacity:1}
+  100%{opacity:0;top:106%;transform:translate3d(var(--dx,0),0,0) rotate(var(--rot,540deg))}
+}
+.fx s{position:absolute;width:7px;height:7px;border-radius:50%;background:#fff;opacity:0;
+  box-shadow:0 0 10px 3px rgba(255,232,190,.95);animation:pop 1s ease-out forwards}
+@keyframes pop{0%{opacity:0;transform:scale(.2)}28%{opacity:1;transform:scale(1.4)}100%{opacity:0;transform:scale(.35)}}
+
+/* 計算中：魔法陣がゆっくり閉じていく */
+.calc{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;gap:0;padding:0 26px}
+.calc .circle{position:relative;width:186px;height:186px;display:grid;place-items:center}
+/* 絵そのものは回さない。中央の「?」が一緒に傾いて、
+   むしろ壊れて見えていた（魔法陣は左右対称なので回転が伝わらない）。
+   絵は呼吸させるだけにして、動きは上に重ねたリングと光の走査で見せる。 */
+.calc .circle img{width:100%;height:100%;object-fit:contain;border-radius:50%;
+  animation:mpulse 2.6s ease-in-out infinite}
+@keyframes mpulse{
+  0%,100%{transform:scale(1);filter:saturate(1.02) brightness(1)}
+  50%{transform:scale(1.035);filter:saturate(1.16) brightness(1.07)}
+}
+@keyframes swirl{to{transform:rotate(360deg)}}
+@keyframes swirlBack{to{transform:rotate(-360deg)}}
+
+.calc .ring{position:absolute;inset:-10px;border-radius:50%;
+  border:1.5px dashed rgba(217,154,171,.75);animation:swirl 6s linear infinite}
+.calc .ring.b{inset:6px;border:1.5px dashed rgba(160,135,112,.5);
+  animation:swirlBack 9s linear infinite}
+/* 短い弧を2本、逆向きに回す。ここが「回っている」の主役 */
+.calc .ring.c{inset:-20px;border:2px solid transparent;
+  border-top-color:var(--pink-d);border-right-color:rgba(217,154,171,.35);
+  animation:swirl 1.9s cubic-bezier(.5,0,.5,1) infinite}
+.calc .ring.d{inset:16px;border:2px solid transparent;
+  border-bottom-color:var(--gold);animation:swirlBack 2.7s linear infinite}
+/* 光の走査。中央はくり抜くので「?」は隠れない */
+@supports ((mask:radial-gradient(#000,#000)) or (-webkit-mask:radial-gradient(#000,#000))){
+  .calc .sweep{
+    position:absolute;inset:-10px;border-radius:50%;pointer-events:none;mix-blend-mode:screen;
+    background:conic-gradient(from 0deg,rgba(255,255,255,0) 0deg,rgba(255,244,224,.9) 24deg,rgba(255,255,255,0) 58deg);
+    -webkit-mask:radial-gradient(circle,transparent 43%,#000 47%,#000 99%,transparent 100%);
+            mask:radial-gradient(circle,transparent 43%,#000 47%,#000 99%,transparent 100%);
+    animation:swirl 2.2s linear infinite;
+  }
+}
+.calc .glow{position:absolute;inset:-18px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,rgba(255,232,214,.85),rgba(255,232,214,0) 62%);
+  animation:breathe 2.1s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.35;transform:scale(.94)}50%{opacity:.9;transform:scale(1.06)}}
+.calc p{font-family:var(--serif);font-weight:800;font-size:15.5px;letter-spacing:.08em;margin:20px 0 0;min-height:24px}
+.calc .line{display:inline-block;animation:fi .4s ease both}
+.calc .cbar{width:170px;height:4px;border-radius:99px;background:var(--champagne);overflow:hidden;margin-top:14px}
+.calc .cbar i{display:block;height:100%;width:0;border-radius:99px;
+  background:linear-gradient(90deg,var(--pink-d),var(--gold));transition:width .5s linear}
+
+/* 結果のリビール */
+.reveal{animation:revealIn .72s cubic-bezier(.16,1,.3,1) both}
+@keyframes revealIn{
+  0%{opacity:0;transform:scale(.86) translateY(14px);filter:blur(9px)}
+  60%{filter:blur(0)}
+  100%{opacity:1;transform:none;filter:blur(0)}
+}
+.pop-in{animation:popIn .5s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes popIn{from{opacity:0;transform:scale(.7)}}
+.stagger>*{animation:fi .5s ease both}
+
+/* レア度バッジ */
+.rare{
+  display:inline-flex;align-items:center;gap:7px;margin:10px auto 0;
+  background:linear-gradient(135deg,#FFF8EE,#FDEBEF);border:1.5px solid var(--champagne);
+  border-radius:99px;padding:6px 14px 6px 11px;box-shadow:0 5px 16px rgba(168,124,139,.16);
+}
+.rare .st{font-size:12px;letter-spacing:.08em;color:#E0B45C;line-height:1}
+u{text-decoration:none}
+.rare .st u,.gcell i u{color:rgba(88,74,78,.22);text-decoration:none}
+.rare .pc{font-family:var(--serif);font-weight:800;font-size:13px;letter-spacing:.02em}
+.rare .pc em{font-style:normal;color:var(--pink-d);font-size:15px}
+.rare.lv5{background:linear-gradient(135deg,#FFF3D9,#FCE4EC);border-color:#E8CB92}
+.rare.lv5 .st{color:#D9A441}
+.rareNote{font-size:10px;color:var(--plum-soft);margin:6px 0 0;line-height:1.6}
+
+/* 数字カウントアップ */
+.axis .lb b{font-variant-numeric:tabular-nums}
+
+/* 図鑑の進み */
+.collect{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:11px 13px;margin-top:12px}
+.collect .top{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;font-weight:800;color:var(--plum-soft)}
+.collect .top b{font-family:var(--serif);font-size:15px;color:var(--plum)}
+.collect .tr{height:7px;border-radius:99px;background:#F3E9E1;overflow:hidden;margin-top:7px}
+.collect .tr i{display:block;height:100%;border-radius:99px;
+  background:linear-gradient(90deg,var(--pink-d),var(--gold));transition:width .9s cubic-bezier(.34,1.2,.5,1)}
+.gcell{position:relative;transition:filter .35s ease,opacity .35s ease}
+.gcell.locked{filter:saturate(.62);opacity:.88}
+.gcell.locked .cap b{color:var(--plum-soft)}
+.gcell:not(.locked){box-shadow:0 4px 14px rgba(217,164,65,.14)}
+.gcell .met{position:absolute;top:7px;right:7px;z-index:2;width:20px;height:20px;border-radius:50%;
+  background:linear-gradient(135deg,#EFC97B,#D9A441);color:#fff;font-size:11px;font-weight:900;
+  display:grid;place-items:center;box-shadow:0 3px 9px rgba(217,164,65,.45)}
+.gcell .newf{position:absolute;top:7px;left:7px;z-index:2;background:var(--pink-d);color:#fff;
+  border-radius:99px;padding:2px 7px;font-size:8.5px;font-weight:900;letter-spacing:.08em;
+  animation:blip 1.3s ease-in-out infinite}
+@keyframes blip{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+
+/* 前回の結果／シェアされた結果 */
+.resume{
+  display:flex;align-items:center;gap:11px;width:100%;margin-top:12px;cursor:pointer;
+  background:#fff;border:1.5px solid var(--champagne);border-radius:var(--r);
+  padding:10px 13px;font:inherit;color:inherit;text-align:left;
+}
+.resume img{width:44px;height:44px;border-radius:50%;flex:0 0 auto;object-fit:cover;background:#F5EBE6}
+.resume .rt{flex:1;min-width:0}
+.resume .rt i{display:block;font-style:normal;font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--gold)}
+.resume .rt b{display:block;font-family:var(--serif);font-size:14px;margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.resume .arw{color:var(--pink-d);font-weight:900;font-size:15px}
+.banner{
+  background:linear-gradient(160deg,#FFF7F2,#FBE9EE);border:1.5px solid var(--pink);
+  border-radius:16px;padding:11px 13px;margin-top:2px;font-size:11.5px;font-weight:700;
+  line-height:1.65;color:var(--plum);text-align:center;
+}
+.runs{font-size:10.5px;font-weight:800;letter-spacing:.08em;color:var(--gold);text-align:center;margin:10px 0 0}
+
+/* マイルストーン用トースト（少し大きめ） */
+.toast.big{font-family:var(--serif);font-size:14px;padding:12px 22px}
+
+/* シェアカードの足元（QRをやめて、URLの文字にした） */
+.shot .site{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:9.5px;
+  letter-spacing:.1em;color:var(--plum-soft);text-align:right;line-height:1.45;max-width:47%;
+  word-break:break-all}
+.shot .rarechip{
+  display:inline-flex;align-items:center;gap:5px;margin:9px auto 0;background:rgba(255,255,255,.8);
+  border:1px solid var(--champagne);border-radius:99px;padding:3px 10px;font-size:9.5px;font-weight:800;
+}
+.shot .rarechip u{text-decoration:none;color:#D9A441;letter-spacing:.06em}
+.srow .sv{background:linear-gradient(135deg,#C79FAC,#A87C8B);color:#fff}
+.srow button[disabled]{opacity:.55;cursor:default}
+.hint b{color:#FFE7C9}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001s!important;transition-duration:.05s!important}
+  .fx{display:none}
+}
 </style>
 </head>
 <body>
@@ -330,11 +503,13 @@ body{
   <div class="stars" id="stars" aria-hidden="true"></div>
 
   <header class="bar">
-    <div class="mark" id="markTitle">美脚の魔女図鑑<span>LEG WITCH CODEX</span></div>
+    <button class="mark" id="markTitle" aria-label="ホームへ">美脚の魔女図鑑<span>LEG WITCH CODEX</span></button>
+    <div class="hdr-right">
+    <button class="snd" id="sndBtn" aria-pressed="false" aria-label="BGM"></button>
     <div class="lang" role="group" aria-label="Language">
       <button id="langJa" aria-pressed="true">日本語</button>
       <button id="langEn" aria-pressed="false">EN</button>
-    </div>
+    </div></div>
   </header>
 
   <main class="screen" id="screen"></main>
@@ -355,6 +530,12 @@ var store={
   save:function(o){ mem=o; try{localStorage.setItem(KEY,JSON.stringify(o));}catch(e){} }
 };
 var saved = store.load() || {};
+/* 以前は保存のたびにオブジェクトを丸ごと作り直していたので、
+   書かなかった項目（BGM設定など）が毎回消えていた。差分で書く。 */
+function persist(patch){
+  for(var k in patch){ if(patch.hasOwnProperty(k)) saved[k]=patch[k]; }
+  store.save(saved);
+}
 
 /* ============================================================
    1. 多言語辞書
@@ -375,7 +556,7 @@ var T = {
     sub:"12の質問で、食事・めぐり・リズム・こころを読み解きます。<br>あなたの脚のクセを、1人の魔女にしてお返しします。",
     chip1:"12問・約2分", chip2:"16タイプ", chip3:"登録なし",
     start:"診断をはじめる", again:"もう一度診断する", codex:"16人の図鑑を見る",
-    qOf:"質問 {n} / {t}", back:"← ひとつ戻る",
+    qOf:"質問 {n} / {t}", back:"← ひとつ戻る", toHome:"ホームへ", bgmOn:"音をつける", bgmOff:"音を消す",
     calc:"魔法陣を描いています…",
     resultTitle:"あなたの中の魔女", axisTitle:"あなたの4つの傾向",
     tipsTitle:"今日からの3つの魔法", matchTitle:"相性のいい魔女",
@@ -387,8 +568,22 @@ var T = {
     codexTitle:"16人の魔女", codexSub:"タップすると、その魔女の話が読めます。",
     you:"あなた",
     cat:{water:"食事とめぐり",muscle:"脚の使い方",rhythm:"1日のリズム",mind:"こころのクセ"},
-    axisName:{water:"うるおい",muscle:"しなやかさ",rhythm:"めぐり",mind:"ごきげん"},
-    shareText:"わたしの中の魔女は「{name}」でした。\n{catch}\n#美脚の魔女図鑑"
+    axisName:{water:"うるおい",muscle:"脚の力",rhythm:"めぐり",mind:"ごきげん"},
+    shareText:"わたしの中の魔女は「{name}」でした。\n{catch}\n#美脚の魔女図鑑",
+    calcSteps:["食事とめぐりを読んでいます…","脚の使い方を見ています…","1日のリズムを重ねています…","こころのクセを写しています…"],
+    rarityTitle:"レア度", rarityOf:"16人のうち、あなたは<em>{p}%</em>",
+    rarityNote:"※回答が均等に分かれた場合の理論値",
+    rarityLv:["よく出会う魔女","わりといる魔女","ちょっとめずらしい","かなりめずらしい","超レア"],
+    collectTitle:"出会った魔女", collectOf:"{n} / 16",
+    collectDone:"16人ぜんぶに出会った！", newBadge:"NEW",
+    seeLast:"前回の結果を見る", lastLabel:"前回のあなた",
+    friendBanner:"シェアされた結果を見ています。<br>あなたの魔女も探してみて。",
+    meToo:"わたしも診断する",
+    runsLabel:"{n}回目の診断", half:"折り返し！のこり6問",
+    lastQ:"さいごの1問", almost:"あと{n}問",
+    saveImg:"画像を保存", shareImg:"シェアする", making:"カードを作っています…",
+    savedImg:"画像を保存しました", shareFail:"保存できませんでした",
+    shotHintNew:"<b>画像を保存</b>して、ストーリーズに貼ってね"
   },
   en:{
     brand:"Leg Witch Codex", brandSub:"LEG WITCH CODEX",
@@ -402,7 +597,7 @@ var T = {
     sub:"Twelve questions read your food, flow, rhythm and mindset.<br>Your habits come back to you as a single witch.",
     chip1:"12 questions · 2 min", chip2:"16 types", chip3:"No sign-up",
     start:"Start the reading", again:"Take it again", codex:"See all 16 witches",
-    qOf:"Question {n} / {t}", back:"← Back",
+    qOf:"Question {n} / {t}", back:"← Back", toHome:"Home", bgmOn:"Turn sound on", bgmOff:"Turn sound off",
     calc:"Drawing the circle…",
     resultTitle:"The witch inside you", axisTitle:"Your four tendencies",
     tipsTitle:"Three spells for today", matchTitle:"Your best match",
@@ -414,8 +609,22 @@ var T = {
     codexTitle:"The 16 witches", codexSub:"Tap a witch to read her story.",
     you:"YOU",
     cat:{water:"Food & fluid",muscle:"How you move",rhythm:"Daily rhythm",mind:"Mindset"},
-    axisName:{water:"Hydration",muscle:"Suppleness",rhythm:"Circulation",mind:"Ease"},
-    shareText:"My inner witch is \u201c{name}\u201d.\n{catch}\n#LegWitchCodex"
+    axisName:{water:"Hydration",muscle:"Leg strength",rhythm:"Circulation",mind:"Ease"},
+    shareText:"My inner witch is \u201c{name}\u201d.\n{catch}\n#LegWitchCodex",
+    calcSteps:["Reading your food and fluid…","Watching how you move…","Layering your daily rhythm…","Tracing your mindset…"],
+    rarityTitle:"Rarity", rarityOf:"You are <em>{p}%</em> of the sixteen",
+    rarityNote:"Theoretical share for evenly split answers",
+    rarityLv:["A common witch","Fairly common","A little rare","Quite rare","Ultra rare"],
+    collectTitle:"Witches met", collectOf:"{n} / 16",
+    collectDone:"You have met all sixteen!", newBadge:"NEW",
+    seeLast:"See your last result", lastLabel:"Last time",
+    friendBanner:"You are viewing a shared result.<br>Go find your own witch.",
+    meToo:"Take the reading myself",
+    runsLabel:"Reading no. {n}", half:"Halfway — six to go",
+    lastQ:"Last question", almost:"{n} to go",
+    saveImg:"Save image", shareImg:"Share", making:"Building your card…",
+    savedImg:"Image saved", shareFail:"Could not save",
+    shotHintNew:"<b>Save the image</b> and post it to your stories"
   }
 };
 function L(k){ var o=T[LANG]; return k.split(".").reduce(function(a,b){return a?a[b]:null;},o) || k; }
@@ -551,8 +760,87 @@ function icon(code, size){
 /* ============================================================
    5. 状態
    ============================================================ */
-var step=-1, answers=[], result=null;
+var step=-1, answers=[], picked=[], result=null, friendMode=false;
 var runs = saved.runs || 0;
+var seen = (saved.seen && saved.seen.join) ? saved.seen.slice() : [];
+
+/* ============================================================
+   5-a. レア度
+   各軸は3問 × (-1/0/+1)。回答が均等なら合計が正になる確率は 10/27。
+   16タイプの出現率はその積で、合計はちょうど 1 になる。
+   （実測値ではないので、画面にもそう書いてある）
+   ============================================================ */
+var P_POS = 10/27;
+function rarityP(code){
+  var p=1;
+  code.split("").forEach(function(ch){ p *= ("FKAG".indexOf(ch)>=0) ? P_POS : (1-P_POS); });
+  return p;
+}
+function rarityLv(code){
+  var p=rarityP(code)*100;
+  return p<=2 ? 5 : p<=4 ? 4 : p<=6 ? 3 : p<=10 ? 2 : 1;
+}
+function rarityPct(code){
+  var p=rarityP(code)*100;
+  return p<10 ? p.toFixed(1) : Math.round(p);
+}
+function stars(lv){
+  var h="";
+  for(var i=1;i<=5;i++) h += (i<=lv? "\u2605" : '<u>\u2605</u>');
+  return h;
+}
+
+/* ============================================================
+   5-b. 演出（紙吹雪・きらめき・ふるえ）
+   ============================================================ */
+var reduceMotion = false;
+try{ reduceMotion = window.matchMedia("(prefers-reduced-motion:reduce)").matches; }catch(e){}
+var fxLayer = null;
+function fxBox(){
+  if(!fxLayer){ fxLayer=document.createElement("div"); fxLayer.className="fx"; $("app").appendChild(fxLayer); }
+  return fxLayer;
+}
+var CONF=["#E8C86A","#E58AA4","#F7DDE3","#CDE6F5","#FFFFFF","#D9A441","#BEDCB2"];
+function confetti(n, spread){
+  if(reduceMotion) return;
+  var box=fxBox(), h="";
+  for(var i=0;i<n;i++){
+    var dx=((Math.random()*2-1)*(spread||42)).toFixed(0);
+    h+='<b style="left:'+(6+Math.random()*88).toFixed(1)+'%;'+
+       'background:'+CONF[(Math.random()*CONF.length)|0]+';'+
+       '--dx:'+dx+'vw;--rot:'+((Math.random()*900-450)|0)+'deg;'+
+       '--dur:'+(2.1+Math.random()*1.7).toFixed(2)+'s;'+
+       'animation-delay:'+(Math.random()*.5).toFixed(2)+'s;'+
+       'width:'+(6+Math.random()*5).toFixed(1)+'px;height:'+(10+Math.random()*7).toFixed(1)+'px"></b>';
+  }
+  var wrap=document.createElement("div"); wrap.innerHTML=h;
+  while(wrap.firstChild) box.appendChild(wrap.firstChild);
+  setTimeout(function(){ if(box.children.length>260) box.innerHTML=""; }, 4200);
+}
+function sparkle(el, n){
+  if(reduceMotion || !el) return;
+  var r=el.getBoundingClientRect(), a=$("app").getBoundingClientRect(), box=fxBox();
+  for(var i=0;i<(n||10);i++){
+    var d=document.createElement("s");
+    d.style.left=(r.left-a.left+Math.random()*r.width)+"px";
+    d.style.top=(r.top-a.top+Math.random()*r.height)+"px";
+    d.style.animationDelay=(Math.random()*.45).toFixed(2)+"s";
+    box.appendChild(d);
+    (function(node){ setTimeout(function(){ if(node.parentNode) node.parentNode.removeChild(node); },1600); })(d);
+  }
+}
+function buzz(pat){ try{ if(navigator.vibrate) navigator.vibrate(pat); }catch(e){} }
+function countUp(el, to, ms){
+  if(reduceMotion){ el.textContent=to; return; }
+  var t0=null;
+  function tick(t){
+    if(t0===null) t0=t;
+    var k=Math.min(1,(t-t0)/(ms||900));
+    el.textContent = Math.round(to * (1-Math.pow(1-k,3)));
+    if(k<1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
 var AD_EVERY = 1;                    /* PR枠を出す頻度。1=毎回、3なら3回に1回 */
 var AD_URL = "https://amzn.to/4bkhWjp";
 function adCard(){
@@ -565,7 +853,11 @@ function adCard(){
 var $=function(id){return document.getElementById(id);};
 var screen=$("screen"), sheet=$("sheet"), sheetIn=$("sheetIn");
 
-function toast(t){ var e=$("toast"); e.textContent=t; e.classList.add("on"); setTimeout(function(){e.classList.remove("on");},1700); }
+function toast(t, big){
+  var e=$("toast"); e.textContent=t;
+  e.classList.toggle("big", !!big); e.classList.add("on");
+  clearTimeout(e._t); e._t=setTimeout(function(){e.classList.remove("on");},1900);
+}
 // 画像がキャッシュ済みだと onload が来ずに透明のままになることがあるので、描画後に必ず確認する
 function markReady(){
   var im = screen.querySelectorAll("img.figure, .thumb img, .shotimg img");
@@ -588,10 +880,129 @@ function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {"&":"&am
 })();
 
 /* ============================================================
+   BGM：オルゴール風のループを、その場で合成して鳴らす
+   （音源ファイルを持たないので容量ゼロ。最初のタップで再生開始）
+   ============================================================ */
+var Music = (function(){
+  var ctx=null, master=null, filt=null, sfxBus=null, timer=null;
+  /* snd = 効果音つき（既定ON）。BGM は結果が出た瞬間に自分で立ち上がる。
+     ヘッダーのボタンは「音ぜんぶ」のスイッチ。ページを開いた時点では
+     ブラウザの仕様でどのみち鳴らないので、いきなり音が出ることはない。 */
+  var snd = (saved.snd === false) ? false : true;
+  var on = false;                          /* BGM が鳴っているか */
+  var step=0, nextT=0, bpm=84, beat=60/84;
+  /* Am7 → Fmaj7 → Cmaj7 → G6 をゆっくり回す */
+  var CH=[[57,60,64,67],[53,57,60,64],[48,55,59,64],[55,59,62,64]];
+  var PAT=[0,2,1,3,2,0,3,1];
+  function hz(m){ return 440*Math.pow(2,(m-69)/12); }
+  function tone(t, midi, dur, type, vol){
+    var o=ctx.createOscillator(), g=ctx.createGain();
+    o.type=type; o.frequency.value=hz(midi);
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(vol,t+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(g); g.connect(filt); o.start(t); o.stop(t+dur+0.05);
+  }
+  function schedule(){
+    if(!ctx) return;
+    while(nextT < ctx.currentTime + 0.5){
+      var bar=Math.floor(step/8)%4, ch=CH[bar], i=step%8;
+      tone(nextT, ch[PAT[i]]+12, 1.25, "sine", 0.085);            /* オルゴールの旋律 */
+      if(i===0) tone(nextT, ch[0]-12, 2.2, "triangle", 0.05);      /* 低音 */
+      if(i===4) tone(nextT, ch[2], 1.0, "sine", 0.035);
+      if(Math.random()<0.16) tone(nextT+beat/4, ch[(Math.random()*4)|0]+24, 0.7, "sine", 0.03); /* きらきら */
+      step++; nextT += beat/2;
+    }
+  }
+  function build(){
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return false;
+    try{ ctx = new AC(); }catch(e){ return false; }
+    master = ctx.createGain(); master.gain.value = 0.0001;
+    filt = ctx.createBiquadFilter(); filt.type="lowpass"; filt.frequency.value=2600;
+    var dly=ctx.createDelay(); dly.delayTime.value=0.28;
+    var fb=ctx.createGain(); fb.gain.value=0.22;
+    filt.connect(master); filt.connect(dly); dly.connect(fb); fb.connect(dly); dly.connect(master);
+    master.connect(ctx.destination);
+    sfxBus = ctx.createGain(); sfxBus.gain.value = 0.9; sfxBus.connect(ctx.destination);
+    nextT = ctx.currentTime + 0.1;
+    timer = setInterval(schedule, 120);
+    return true;
+  }
+  /* 効果音。音源ファイルは持たず、その場で作る */
+  function blip(t, midi, dur, type, vol){
+    var o=ctx.createOscillator(), g=ctx.createGain();
+    o.type=type||"sine"; o.frequency.value=hz(midi);
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(vol,t+0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(g); g.connect(sfxBus); o.start(t); o.stop(t+dur+0.03);
+  }
+  var SFX={
+    tap:  [[76,.12,"sine",.10]],
+    back: [[69,.12,"sine",.07]],
+    step: [[72,.14,"triangle",.07],[79,.16,"sine",.06]],
+    open: [[64,.5,"sine",.07],[71,.5,"sine",.05]],
+    reveal:[[60,.9,"sine",.10],[64,.9,"sine",.08],[67,.9,"sine",.08],[72,1.4,"sine",.10]],
+    rare: [[72,.7,"sine",.09],[76,.7,"sine",.08],[79,.7,"sine",.08],[84,1.5,"sine",.10],[88,1.6,"sine",.06]],
+    done: [[65,.5,"sine",.08],[69,.5,"sine",.07],[72,.9,"sine",.09]]
+  };
+  function fade(to){
+    if(!ctx) return;
+    master.gain.cancelScheduledValues(ctx.currentTime);
+    master.gain.setValueAtTime(Math.max(master.gain.value,0.0001), ctx.currentTime);
+    master.gain.exponentialRampToValueAtTime(Math.max(to,0.0001), ctx.currentTime+0.8);
+  }
+  function wake(){
+    if(!snd) return false;
+    try{
+      if(!ctx && !build()) return false;
+      if(ctx.state==="suspended") ctx.resume();
+      return true;
+    }catch(e){ return false; }
+  }
+  return {
+    isOn:function(){ return snd; },
+    bgmOn:function(){ return on; },
+    /* 画面のどこかが押されたときに呼ぶ。音が許可されるのはユーザー操作の中だけ */
+    resume:function(){ if(wake() && on) fade(0.16); },
+    sfx:function(name){
+      if(!wake()) return;
+      var list=SFX[name]; if(!list) return;
+      var t0=ctx.currentTime+0.01;
+      list.forEach(function(v,i){ blip(t0 + i*0.055, v[0], v[1], v[2], v[3]); });
+    },
+    /* 結果が出た瞬間だけ、そっとBGMを立ち上げる */
+    startBgm:function(){
+      if(on || !wake()) return;
+      on = true; persist({bgm:true}); fade(0.13);
+      if(typeof sndIcon==="function") sndIcon();
+    },
+    toggle:function(){
+      snd = !snd; persist({snd:snd});
+      if(snd){ wake(); if(on) fade(0.16); }
+      else { on=false; persist({bgm:false}); fade(0.0001);
+             if(ctx && ctx.suspend) setTimeout(function(){ try{ctx.suspend();}catch(e){} },900); }
+      return snd;
+    },
+    pause:function(){ if(ctx && on) fade(0.0001); },
+    unpause:function(){ if(ctx && on) fade(0.16); }
+  };
+})();
+
+/* ============================================================
    6. 画面
    ============================================================ */
+function beginQuiz(){
+  answers=[]; picked=[]; friendMode=false; step=0;
+  Music.sfx("open"); buzz(12);
+  if(location.hash) { try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} }
+  renderQ();
+}
+
 function renderIntro(){
-  step=-1;
+  step=-1; friendMode=false;
+  var last = saved.code && TYPES[saved.code] ? saved.code : null;
   screen.innerHTML =
    '<div class="pad fadein"><div class="hero">'+
      '<div class="lead">'+L("lead")+'</div>'+
@@ -600,41 +1011,88 @@ function renderIntro(){
      '<p class="sub">'+L("sub")+'</p>'+
      '<div class="rule"></div>'+
      '<div class="chips"><span class="chip">'+L("chip1")+'</span><span class="chip">'+L("chip2")+'</span><span class="chip">'+L("chip3")+'</span></div>'+
-     '<button class="cta" id="startBtn">'+L("start")+'</button>'+
+     '<button class="cta" id="startBtn">'+(last?L("again"):L("start"))+'</button>'+
+     (last ? '<button class="resume" id="resumeBtn">'+
+               '<img src="'+imgURL(last,1)+'" alt="" loading="lazy">'+
+               '<span class="rt"><i>'+L("lastLabel")+'</i><b>'+esc(TYPES[last][LANG].n)+'</b></span>'+
+               '<span class="arw">\u203a</span></button>' : '')+
      '<button class="ghost" id="codexBtn">'+L("codex")+'</button>'+
+     collectBar()+
+     (runs>0 ? '<p class="runs">'+L("runsLabel").replace("{n}",runs)+'</p>' : '')+
    '</div></div>';
-  $("startBtn").onclick=function(){ answers=[]; step=0; renderQ(); };
-  $("codexBtn").onclick=function(){ renderCodex(); };
+  $("startBtn").onclick=beginQuiz;
+  $("codexBtn").onclick=function(){ Music.sfx("tap"); renderCodex(); };
+  if($("resumeBtn")) $("resumeBtn").onclick=function(){
+    Music.sfx("tap");
+    result={code:saved.code, sc:null, pct:saved.pct||{water:50,muscle:50,rhythm:50,mind:50}};
+    renderResult(true);
+  };
+  animateCollect();
+}
+
+/* 図鑑の進み（集めたくなるやつ） */
+function collectBar(){
+  if(!seen.length) return "";
+  var n=seen.length, pc=Math.round(n/16*100);
+  return '<div class="collect"><div class="top"><span>'+L("collectTitle")+'</span>'+
+         '<b>'+L("collectOf").replace("{n}",n)+'</b></div>'+
+         '<div class="tr"><i data-w="'+pc+'" style="width:0"></i></div>'+
+         (n>=16?'<div class="top" style="margin-top:8px;color:var(--pink-d)"><span>'+L("collectDone")+'</span></div>':'')+
+         '</div>';
+}
+function animateCollect(){
+  var i=screen.querySelector(".collect .tr i");
+  if(i) setTimeout(function(){ i.style.width=i.getAttribute("data-w")+"%"; },160);
 }
 
 /* タイトル画面の飾り */
 var ORNAMENT = '<img class="mandala" src="' + MANDALA + '" alt="" aria-hidden="true">';
 
 function renderQ(){
-  var q=Q[step], t=q[LANG], pct=Math.round(step/Q.length*100);
+  if(step<0 || step>=Q.length){ renderIntro(); return; }
+  var q=Q[step], t=q[LANG];
+  /* 回答ずみの数で出す。最後の1問に答えると 100% まで伸びる */
+  var pct=Math.round(step/Q.length*100);
+  var left=Q.length-step;
+  var note = left===1 ? L("lastQ") : (left<=4 ? L("almost").replace("{n}",left) : "");
   screen.innerHTML =
-   '<div class="prog"><div class="track"><i style="width:'+pct+'%"></i></div>'+
-     '<div class="meta"><span>'+L("qOf").replace("{n}",step+1).replace("{t}",Q.length)+'</span><span>'+pct+'%</span></div></div>'+
+   '<div class="prog"><div class="track"><i id="progI" style="width:'+pct+'%"></i></div>'+
+     '<div class="meta"><span>'+L("qOf").replace("{n}",step+1).replace("{t}",Q.length)+
+       (note?' \u00b7 '+note:'')+'</span><span id="progP">'+pct+'%</span></div></div>'+
    '<div class="pad fadein">'+
      '<div class="qcat">'+IC[q.ic[2]]+L("cat."+q.ax)+'</div>'+
      '<h2 class="qtext">'+esc(t.q)+'</h2>'+
      t.a.map(function(a,i){
-       return '<button class="opt" data-i="'+i+'"><span class="ic">'+IC[q.ic[i]]+'</span><span class="tx">'+esc(a)+'</span></button>';
+       return '<button class="opt'+(picked[step]===i?" on":"")+'" data-i="'+i+'">'+
+              '<span class="ic">'+IC[q.ic[i]]+'</span><span class="tx">'+esc(a)+'</span></button>';
      }).join("")+
-     (step>0 ? '<button class="back" id="backBtn">'+L("back")+'</button>' : '')+
+     '<div class="navrow">'+
+       (step>0 ? '<button class="back" id="backBtn">'+L("back")+'</button>' : '<span></span>')+
+       '<button class="back" id="qHome">'+L("toHome")+'</button>'+
+     '</div>'+
    '</div>';
   Array.prototype.forEach.call(screen.querySelectorAll(".opt"), function(b){
     b.onclick=function(){
+      var i=+b.getAttribute("data-i");
+      Array.prototype.forEach.call(screen.querySelectorAll(".opt"), function(o){ o.classList.remove("on"); });
       b.classList.add("on");
-      answers[step]=Q[step].w[+b.dataset.i];
+      picked[step]=i;
+      answers[step]=Q[step].w[i];
+      Music.sfx("tap"); buzz(9); sparkle(b.querySelector(".ic"), 6);
+      /* 押した瞬間にバーが伸びる。ここが気持ちいいかどうかで完走率が変わる */
+      var done=step+1, np=Math.round(done/Q.length*100);
+      if($("progI")) $("progI").style.width=np+"%";
+      if($("progP")) $("progP").textContent=np+"%";
+      if(done===6){ Music.sfx("step"); toast(L("half"), true); }
       setTimeout(function(){
         step++;
         if(step>=Q.length) renderCalc(); else renderQ();
         screen.scrollTop=0;
-      }, 190);
+      }, 260);
     };
   });
-  if($("backBtn")) $("backBtn").onclick=function(){ step--; renderQ(); };
+  if($("backBtn")) $("backBtn").onclick=function(){ Music.sfx("back"); step--; renderQ(); };
+  $("qHome").onclick=function(){ answers=[]; picked=[]; Music.sfx("back"); renderIntro(); };
 }
 
 function score(){
@@ -646,27 +1104,58 @@ function score(){
   return {code:code, sc:sc, pct:pct};
 }
 
+var calcTimers=[];
+function clearCalc(){ calcTimers.forEach(clearTimeout); calcTimers=[]; }
+
 function renderCalc(){
-  screen.innerHTML='<div class="calc"><div class="orb"></div><p>'+L("calc")+'</p></div>';
+  clearCalc();
+  screen.innerHTML =
+    '<div class="calc">'+
+      '<div class="circle"><div class="glow"></div>'+
+        '<img src="'+MANDALA+'" alt="" aria-hidden="true">'+
+        '<div class="sweep"></div>'+
+        '<div class="ring"></div><div class="ring b"></div>'+
+        '<div class="ring c"></div><div class="ring d"></div>'+
+      '</div>'+
+      '<p id="calcLine"><span class="line">'+L("calc")+'</span></p>'+
+      '<div class="cbar"><i id="calcBar"></i></div>'+
+    '</div>';
   var pre=score();
-  var warm=new Image(); warm.src=imgURL(pre.code);      // 計算中に結果画像を先読み
-  setTimeout(function(){
+  var warm=new Image(); warm.src=imgURL(pre.code);   /* 結果画像を先読みしておく */
+  var lines=L("calcSteps"), total=2400;
+  if(!lines.join) lines=[L("calc")];
+  /* 4つの軸を順に読み上げる。ただ待たせるより、期待が積み上がる */
+  lines.forEach(function(txt,i){
+    calcTimers.push(setTimeout(function(){
+      var el=$("calcLine"); if(!el) return;
+      el.innerHTML='<span class="line">'+txt+'</span>';
+      Music.sfx("step");
+      var bar=$("calcBar"); if(bar) bar.style.width=Math.round((i+1)/lines.length*100)+"%";
+    }, 120 + i*(total/lines.length)));
+  });
+  calcTimers.push(setTimeout(function(){
     result=pre; runs++;
-    store.save({lang:LANG, code:result.code, pct:result.pct, runs:runs});
-    renderResult();
-  }, 1500);
+    var isNew = seen.indexOf(result.code)<0;
+    if(isNew) seen.push(result.code);
+    persist({lang:LANG, code:result.code, pct:result.pct, runs:runs, seen:seen});
+    renderResult(false, isNew);
+  }, total+320));
 }
 
 function axisRow(k, v){
-  return '<div class="axis"><div class="lb"><span>'+L("cat."+k)+'</span><b>'+L("axisName."+k)+' '+v+'</b></div>'+
-         '<div class="tr"><i style="width:'+v+'%"></i></div></div>';
+  v = Math.max(0, Math.min(100, Math.round(v||0)));
+  return '<div class="axis"><div class="lb"><span>'+L("cat."+k)+'</span>'+
+         '<b>'+L("axisName."+k)+' <span class="num">0</span></b></div>'+
+         '<div class="tr"><i data-w="'+v+'" style="width:0"></i></div></div>';
 }
 
 function tipsFor(r){
-  var ks=Object.keys(r.sc).sort(function(a,b){return r.sc[a]-r.sc[b];});
-  return [TIPS[ks[0]][r.sc[ks[0]]>0?"high":"low"][LANG],
-          TIPS[ks[1]][r.sc[ks[1]]>0?"high":"low"][LANG],
-          TIPS[ks[3]][r.sc[ks[3]]>0?"high":"low"][LANG]];
+  /* 以前は各軸のスコアで high/low を選んでいたので、全部プラスの人には
+     「よくできてます」が3つ並んで、やることが1つも残らなかった。
+     弱い2軸には必ず動ける助言、いちばん強い軸だけほめる、に固定した。 */
+  var sc = r.sc || {water:0,muscle:0,rhythm:0,mind:0};
+  var ks = ["water","muscle","rhythm","mind"].sort(function(a,b){return sc[a]-sc[b];});
+  return [TIPS[ks[0]].low[LANG], TIPS[ks[1]].low[LANG], TIPS[ks[3]].high[LANG]];
 }
 
 function figureTag(code, cls){
@@ -674,16 +1163,30 @@ function figureTag(code, cls){
   return '<img class="'+(cls||"figure")+'" src="'+imgURL(code)+'" alt="'+esc(t.n)+'" width="1100" height="1100"'+
          ' fetchpriority="high" onload="this.classList.add(\'ready\')">';
 }
-function renderResult(){
+function rareBox(code){
+  var lv=rarityLv(code);
+  return '<div class="rare lv'+lv+'" id="rareBox">'+
+           '<span class="st">'+stars(lv)+'</span>'+
+           '<span class="pc">'+L("rarityOf").replace("{p}", rarityPct(code))+'</span>'+
+         '</div>'+
+         '<p class="rareNote">'+L("rarityLv")[lv-1]+'\u3000/\u3000'+L("rarityNote")+'</p>';
+}
+
+function renderResult(quiet, isNew){
+  clearCalc();
   var r=result, ty=TYPES[r.code][LANG], m=matchOf(r.code), mt=TYPES[m][LANG];
+  var lv=rarityLv(r.code);
   screen.innerHTML =
-   '<div class="pad fadein">'+
-    '<div class="hero-card">'+ figureTag(r.code) +
+   '<div class="pad '+(quiet?"fadein":"reveal")+'">'+
+    (friendMode ? '<div class="banner">'+L("friendBanner")+'</div>' : '')+
+    '<div class="hero-card" id="heroCard">'+ figureTag(r.code) +
       '<span class="cr">'+icon(r.code,52)+'</span>'+
     '</div>'+
     '<div class="rtype" style="margin-top:12px"><div class="code">'+L("resultTitle")+'</div>'+
       '<h2>'+esc(ty.n)+'</h2><div class="tcode">'+r.code+'</div><p class="catch">'+esc(ty.c)+'</p>'+
-      '<div class="tagline"><span>'+esc(ty.m)+'</span><span>'+esc(ty.s)+'</span></div></div>'+
+      '<div class="tagline"><span>'+esc(ty.m)+'</span><span>'+esc(ty.s)+'</span></div>'+
+      rareBox(r.code)+
+    '</div>'+
     '<div class="bubble"><b class="who">'+L("naruSays")+'</b>'+esc(ty.t).replace(/\n/g,"<br>")+'</div>'+
     '<div class="card"><h3>'+L("axisTitle")+'</h3>'+
       axisRow("water",r.pct.water)+axisRow("muscle",r.pct.muscle)+axisRow("rhythm",r.pct.rhythm)+axisRow("mind",r.pct.mind)+
@@ -697,38 +1200,75 @@ function renderResult(){
     '<div class="card hogu"><h3>'+L("hoguTitle")+'</h3>'+
       '<p class="hoguLead">'+L("hoguLead")+'</p>'+
       '<p class="hoguBody">'+esc(ty.hp).replace(/\n/g,"<br>")+'</p></div>'+
+    collectBar()+
     adCard()+
-    '<button class="cta" id="shareBtn">'+L("share")+'</button>'+
+    '<button class="cta" id="shareBtn">'+(friendMode?L("meToo"):L("share"))+'</button>'+
     '<button class="ghost" id="codexBtn2">'+L("codex")+'</button>'+
     '<button class="ghost" id="againBtn">'+L("again")+'</button>'+
    '</div>';
   markReady();
-  $("shareBtn").onclick=openShare;
-  $("againBtn").onclick=renderIntro;
-  $("codexBtn2").onclick=renderCodex;
-  $("matchBtn").onclick=function(){ openDetail(m); };
+  animateCollect();
+  animateAxes();
+  $("shareBtn").onclick=function(){ if(friendMode){ beginQuiz(); } else { Music.sfx("open"); openShare(); } };
+  $("againBtn").onclick=beginQuiz;
+  $("codexBtn2").onclick=function(){ Music.sfx("tap"); renderCodex(); };
+  $("matchBtn").onclick=function(){ Music.sfx("open"); openDetail(m); };
+
+  if(quiet) return;
+  /* ここが山場。音・ふるえ・紙吹雪をレア度に合わせて出す */
+  Music.startBgm();
+  setTimeout(function(){
+    Music.sfx(lv>=4 ? "rare" : "reveal");
+    buzz(lv>=4 ? [26,60,26,60,90] : [18,50,30]);
+    confetti(lv>=5 ? 84 : lv>=4 ? 62 : lv>=3 ? 44 : 30);
+    sparkle($("heroCard"), 12);
+    if($("rareBox")){ $("rareBox").classList.add("pop-in"); sparkle($("rareBox"), lv>=4?12:6); }
+  }, 260);
+  if(isNew && seen.length<16) setTimeout(function(){ toast(L("newBadge")+" \u00b7 "+L("collectOf").replace("{n}",seen.length), true); }, 1500);
+  if(seen.length>=16) setTimeout(function(){ Music.sfx("done"); confetti(90); toast(L("collectDone"), true); }, 1700);
+}
+
+/* 4本のバーは0から伸ばして、数字もカウントアップさせる */
+function animateAxes(){
+  Array.prototype.forEach.call(screen.querySelectorAll(".axis"), function(row,i){
+    var bar=row.querySelector(".tr i"), num=row.querySelector("b .num");
+    if(!bar) return;
+    var w=bar.getAttribute("data-w")||"0";
+    setTimeout(function(){
+      bar.style.width=w+"%";
+      if(num) countUp(num, +w, 900);
+    }, 240 + i*130);
+  });
 }
 function iconBox(code){ return '<div style="text-align:center;margin-top:6px">'+icon(code,118)+'</div>'; }
 
 function renderCodex(){
   var mine = result ? result.code : (saved.code||null);
+  /* レアな順に並べる。上から見ていくと自然に「珍しい魔女」が目に入る */
+  var codes = Object.keys(TYPES).sort(function(a,b){ return rarityP(a)-rarityP(b); });
   screen.innerHTML =
    '<div class="pad fadein"><h2 class="qtext" style="margin-bottom:4px">'+L("codexTitle")+'</h2>'+
    '<p class="catch" style="font-size:12px;color:var(--plum-soft);margin:0 0 8px">'+L("codexSub")+'</p>'+
-   '<div class="grid">'+ Object.keys(TYPES).map(function(c){
-      var t=TYPES[c][LANG];
-      return '<button class="gcell'+(c===mine?" me":"")+'" data-c="'+c+'">'+
+   collectBar()+
+   '<div class="grid">'+ codes.map(function(c){
+      var t=TYPES[c][LANG], met=seen.indexOf(c)>=0, lv=rarityLv(c);
+      return '<button class="gcell'+(c===mine?" me":"")+(met?"":" locked")+'" data-c="'+c+'">'+
+             (met?'<span class="met">\u2726</span>':'')+
              '<span class="thumb">'+(c===mine?'<span class="badge">'+L("you")+'</span>':'')+
              '<img src="'+imgURL(c,1)+'" alt="'+esc(t.n)+'" loading="lazy" decoding="async" width="420" height="420"'+
              ' onload="this.classList.add(\'ready\')"></span>'+
-             '<span class="cap"><b>'+esc(t.n)+'</b><i>'+c+'</i></span></button>';
+             '<span class="cap"><b>'+esc(t.n)+'</b>'+
+             '<i style="color:#D9A441;letter-spacing:.1em">'+stars(lv)+'</i></span></button>';
     }).join("")+'</div>'+
-   '<button class="ghost" id="homeBtn" style="margin-top:14px">'+(result?L("again"):L("start"))+'</button></div>';
+   '<button class="cta" id="homeBtn" style="margin-top:14px">'+(result?L("again"):L("start"))+'</button>'+
+   '<button class="ghost" id="toHomeBtn">'+L("toHome")+'</button></div>';
   Array.prototype.forEach.call(screen.querySelectorAll(".gcell"), function(b){
-    b.onclick=function(){ openDetail(b.getAttribute("data-c")); };
+    b.onclick=function(){ Music.sfx("open"); openDetail(b.getAttribute("data-c")); };
   });
   markReady();
-  $("homeBtn").onclick=function(){ answers=[]; step=0; renderQ(); };
+  animateCollect();
+  $("homeBtn").onclick=beginQuiz;
+  $("toHomeBtn").onclick=function(){ Music.sfx("back"); renderIntro(); };
 }
 
 /* キャラクター詳細 */
@@ -741,6 +1281,8 @@ function openDetail(code){
      '<h3>'+esc(t.n)+'</h3><div class="dcode">'+code+'</div>'+
      '<div class="tagline"><span>'+esc(t.m)+'</span><span>'+esc(t.s)+'</span></div>'+
      '<p class="dcatch">'+esc(t.c)+'</p>'+
+     '<div class="rare lv'+rarityLv(code)+'" style="margin-top:10px"><span class="st">'+stars(rarityLv(code))+'</span>'+
+       '<span class="pc">'+L("rarityOf").replace("{p}", rarityPct(code))+'</span></div>'+
      '<div class="bubble" style="text-align:left"><b class="who">'+L("naruSays")+'</b>'+esc(t.t).replace(/\n/g,"<br>")+'</div>'+
      '<div class="card hogu" style="text-align:left"><h3>'+L("hoguTitle")+'</h3>'+
        '<p class="hoguBody">'+esc(t.hp).replace(/\n/g,"<br>")+'</p></div>'+
@@ -751,8 +1293,13 @@ function openDetail(code){
   sheet.classList.add("on"); sheetIn.scrollTop=0; markReady();
 }
 /* ---------- シェアカード ---------- */
+/* 結果を直接開けるURL。友だちが貼ったリンクからその魔女が見られる */
+function shareURL(code){
+  return location.href.split("#")[0] + "#w=" + code;
+}
+
 function openShare(){
-  var r=result, ty=TYPES[r.code][LANG];
+  var r=result, ty=TYPES[r.code][LANG], lv=rarityLv(r.code);
   var bars=[["water",r.pct.water],["muscle",r.pct.muscle],["rhythm",r.pct.rhythm],["mind",r.pct.mind]].map(function(p){
     return '<div class="r"><span class="k">'+L("axisName."+p[0])+'</span><span class="t"><i style="width:'+p[1]+'%"></i></span><span class="v">'+p[1]+'</span></div>';
   }).join("");
@@ -762,27 +1309,193 @@ function openShare(){
      '<div class="shotimg"><img class="figure" src="'+imgURL(r.code)+'" alt="'+esc(ty.n)+'" onload="this.classList.add(\'ready\')"></div>'+
      '<div class="nameRow">'+icon(r.code,40).replace('class="emb"','class="emb shotEmb"')+
        '<div><h2>'+esc(ty.n)+'</h2><div class="code2">'+r.code+'</div></div></div>'+
+     '<div class="rarechip"><u>'+stars(lv)+'</u>'+L("rarityOf").replace("{p}", rarityPct(r.code)).replace(/<\/?em>/g,"")+'</div>'+
      '<p class="cat2">'+esc(ty.c)+'</p>'+
      '<div class="bars">'+bars+'</div>'+
      '<div class="foot"><span class="tag">'+L("tag")+'<span>'+L("resultTitle")+'</span></span>'+
-       '<svg class="qr" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#6B585D"/>'+
-       '<path d="M8 9h5v5H8zM19 9h5v5h-5zM8 18h5v5H8zM18 18h2v2h-2zM22 18h2v2h-2zM20 20h2v2h-2zM18 22h2v2h-2zM22 22h2v2h-2z" fill="#fff"/></svg>'+
+       '<span class="site">'+esc(shareURL(r.code).replace(/^https?:\/\//,""))+'</span>'+
      '</div>'+
    '</div></div>'+
-   '<p class="hint">'+L("shotHint")+'</p>'+
+   '<p class="hint" id="shotHint">'+L("shotHintNew")+'</p>'+
+   '<div class="srow" style="margin-bottom:8px"><button class="sv" id="svBtn">'+
+     (canWebShare() ? L("shareImg") : L("saveImg"))+'</button></div>'+
    '<div class="srow"><a class="x" id="xBtn" target="_blank" rel="noopener">'+L("shareX")+'</a>'+
      '<button class="cp" id="cpBtn">'+L("copy")+'</button>'+
      '<button class="cl" id="clBtn">'+L("close")+'</button></div>';
   var text=L("shareText").replace("{name}", ty.n).replace("{catch}", ty.c);
-  $("xBtn").href="https://twitter.com/intent/tweet?text="+encodeURIComponent(text)+"&url="+encodeURIComponent(location.href.split("#")[0]);
+  var url=shareURL(r.code);
+  $("xBtn").href="https://twitter.com/intent/tweet?text="+encodeURIComponent(text)+"&url="+encodeURIComponent(url);
+  $("xBtn").onclick=function(){ Music.sfx("tap"); };
   $("cpBtn").onclick=function(){
-    var t=text+" "+location.href.split("#")[0];
+    var t=text+" "+url;
     if(navigator.clipboard && navigator.clipboard.writeText){
       navigator.clipboard.writeText(t).then(function(){toast(L("copied"));},function(){toast(L("copyFail"));});
     } else { toast(L("copyFail")); }
   };
+  $("svBtn").onclick=function(){ exportCard(r.code, text, url); };
   $("clBtn").onclick=closeShare;
   sheet.classList.add("on"); sheetIn.scrollTop=0; markReady();
+}
+
+function canWebShare(){
+  try{ return !!(navigator.canShare && navigator.share && navigator.canShare({files:[new File([new Blob([1])],"a.png",{type:"image/png"})]})); }
+  catch(e){ return false; }
+}
+
+/* ============================================================
+   シェア画像をその場で作る
+   「スクショしてね」はここで卒業。1080x1350 の完成画像を書き出す。
+   ============================================================ */
+function roundRect(c,x,y,w,h,r){
+  c.beginPath();
+  c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r);
+  c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath();
+}
+function loadImg(src){
+  return new Promise(function(res,rej){
+    var i=new Image();
+    i.onload=function(){res(i);}; i.onerror=rej;
+    i.src=src;
+  });
+}
+function wrapText(c,text,x,y,maxW,lh,maxLines){
+  var chars=String(text).split(""), line="", lines=[];
+  for(var i=0;i<chars.length;i++){
+    var t=line+chars[i];
+    if(c.measureText(t).width>maxW && line){ lines.push(line); line=chars[i]; }
+    else line=t;
+    if(maxLines && lines.length>=maxLines) break;
+  }
+  if(line && (!maxLines || lines.length<maxLines)) lines.push(line);
+  lines.forEach(function(l,i){ c.fillText(l, x, y+i*lh); });
+  return y + lines.length*lh;
+}
+
+function buildCard(code){
+  var ty=TYPES[code][LANG], lv=rarityLv(code);
+  /* 1080x1920。そのままストーリーズに貼れる比率 */
+  var W=1080, H=1920, pad=100, iw=W-pad*2;
+  var cv=document.createElement("canvas"); cv.width=W; cv.height=H;
+  var c=cv.getContext("2d");
+  var ser='"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",serif';
+  var rnd='"Zen Maru Gothic","Hiragino Maru Gothic ProN",system-ui,sans-serif';
+
+  var g=c.createLinearGradient(0,0,W*0.35,H);
+  g.addColorStop(0,"#FFFFFF"); g.addColorStop(.45,"#FDF4F2"); g.addColorStop(1,"#F5DCE2");
+  c.fillStyle=g; c.fillRect(0,0,W,H);
+  c.strokeStyle="rgba(160,135,112,.45)"; c.lineWidth=3;
+  roundRect(c,34,34,W-68,H-68,46); c.stroke();
+
+  c.textAlign="center"; c.fillStyle="#A08770";
+  c.font='italic 600 34px "Cormorant Garamond",Georgia,serif';
+  c.fillText("L E G   W I T C H   C O D E X", W/2, 138);
+
+  var iy=196;
+  return loadImg(imgURL(code)).then(function(fig){
+    c.save(); roundRect(c,pad,iy,iw,iw,40); c.clip();
+    c.fillStyle="#F5EBE6"; c.fillRect(pad,iy,iw,iw);
+    c.drawImage(fig,pad,iy,iw,iw); c.restore();
+    c.strokeStyle="rgba(255,255,255,.85)"; c.lineWidth=4;
+    roundRect(c,pad,iy,iw,iw,40); c.stroke();
+    return EMB[code] ? loadImg(EMB[code]).then(null,function(){return null;}) : null;
+  }).then(function(emb){
+    var bottom = iy+iw;                       /* 1076 */
+    var nameY = bottom + 108;
+
+    if(emb){
+      c.save(); c.beginPath(); c.arc(pad+56, nameY-24, 56, 0, Math.PI*2); c.clip();
+      c.drawImage(emb, pad, nameY-80, 112, 112); c.restore();
+    }
+    c.textAlign="left"; c.fillStyle="#584A4E"; c.font='800 62px '+ser;
+    c.fillText(ty.n, pad+138, nameY);
+    c.fillStyle="#A08770"; c.font='italic 600 30px "Cormorant Garamond",Georgia,serif';
+    c.fillText(code.split("").join(" "), pad+140, nameY+48);
+
+    /* レア度：星は左、割合は右 */
+    var rY = nameY + 128;
+    var st=""; for(var si=1;si<=5;si++) st += (si<=lv?"\u2605":"\u2606");
+    c.fillStyle="rgba(255,255,255,.72)"; roundRect(c,pad-14,rY-46,iw+28,72,36); c.fill();
+    c.strokeStyle="rgba(233,220,207,.9)"; c.lineWidth=2;
+    roundRect(c,pad-14,rY-46,iw+28,72,36); c.stroke();
+    c.textAlign="left"; c.fillStyle="#D9A441"; c.font='700 38px '+rnd;
+    c.fillText(st, pad+12, rY);
+    c.textAlign="right"; c.fillStyle="#584A4E"; c.font='800 34px '+ser;
+    c.fillText(L("rarityOf").replace("{p}",rarityPct(code)).replace(/<\/?em>/g,""), W-pad-12, rY);
+
+    /* キャッチ */
+    c.textAlign="left"; c.fillStyle="rgba(88,74,78,.74)"; c.font='700 34px '+rnd;
+    var cy = wrapText(c, ty.c, pad, rY+96, iw, 50, 2);
+
+    /* 4軸を2列で */
+    var keys=["water","muscle","rhythm","mind"];
+    var pct=(result && result.code===code && result.pct) ? result.pct : null;
+    var colW=(iw-52)/2, by=cy+62;
+    keys.forEach(function(k,i){
+      var v = pct ? Math.max(0,Math.min(100,Math.round(pct[k]))) : 50;
+      var x = pad + (i%2)*(colW+52), y = by + Math.floor(i/2)*94;
+      c.textAlign="left"; c.fillStyle="rgba(88,74,78,.68)"; c.font='800 27px '+rnd;
+      c.fillText(L("axisName."+k), x, y);
+      c.textAlign="right"; c.fillStyle="#584A4E"; c.font='900 30px '+rnd;
+      c.fillText(String(v), x+colW, y);
+      c.fillStyle="rgba(88,74,78,.13)"; roundRect(c,x,y+14,colW,16,8); c.fill();
+      var bg=c.createLinearGradient(x,0,x+colW,0);
+      bg.addColorStop(0,"#D99AAB"); bg.addColorStop(1,"#E9DCCF");
+      c.fillStyle=bg; roundRect(c,x,y+14,Math.max(16,colW*v/100),16,8); c.fill();
+    });
+
+    /* フッター */
+    var fy = H - 138;
+    c.strokeStyle="rgba(88,74,78,.22)"; c.lineWidth=2; c.setLineDash([8,8]);
+    c.beginPath(); c.moveTo(pad,fy-56); c.lineTo(W-pad,fy-56); c.stroke(); c.setLineDash([]);
+    c.textAlign="left"; c.fillStyle="#584A4E"; c.font='800 40px '+ser;
+    c.fillText(L("tag"), pad, fy);
+    c.fillStyle="rgba(88,74,78,.6)"; c.font='700 25px '+rnd;
+    c.fillText(L("resultTitle"), pad, fy+40);
+    c.textAlign="right"; c.fillStyle="rgba(88,74,78,.58)";
+    c.font='italic 600 26px "Cormorant Garamond",Georgia,serif';
+    c.fillText(shareURL(code).replace(/^https?:\/\//,""), W-pad, fy+22);
+
+    return new Promise(function(res,rej){
+      try{ cv.toBlob(function(bl){ bl?res(bl):rej(new Error("no blob")); }, "image/png", 0.95); }
+      catch(e){ rej(e); }
+    });
+  });
+}
+
+function exportCard(code, text, url){
+  var btn=$("svBtn"); if(!btn || btn.disabled) return;
+  if(typeof Promise==="undefined" || !document.createElement("canvas").toBlob){
+    var h0=$("shotHint"); if(h0) h0.innerHTML=L("shotHint");
+    toast(L("shareFail")); return;
+  }
+  try{ exportCardInner(code, text, url); }
+  catch(e){ var h=$("shotHint"); if(h) h.innerHTML=L("shotHint"); toast(L("shareFail")); }
+}
+function exportCardInner(code, text, url){
+  var btn=$("svBtn");
+  var label=btn.textContent;
+  btn.disabled=true; btn.textContent=L("making");
+  Music.sfx("tap");
+  var ready = (document.fonts && document.fonts.ready) ? document.fonts.ready.catch(function(){}) : Promise.resolve();
+  ready.then(function(){ return buildCard(code); }).then(function(blob){
+    var file=null;
+    try{ file=new File([blob], "leg-witch-"+code+".png", {type:"image/png"}); }catch(e){}
+    if(file && navigator.canShare && navigator.share && navigator.canShare({files:[file]})){
+      return navigator.share({files:[file], text:text, title:L("brand")}).catch(function(){});
+    }
+    var a=document.createElement("a");
+    a.href=URL.createObjectURL(blob); a.download="leg-witch-"+code+".png";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+    toast(L("savedImg"));
+    confetti(30);
+  }).catch(function(){
+    /* file:// で直接開いた等、canvas が使えないとき。従来どおりスクショ案内に戻す */
+    var h=$("shotHint"); if(h) h.innerHTML=L("shotHint");
+    toast(L("shareFail"));
+  }).then(function(){
+    btn.disabled=false; btn.textContent=label;
+  });
 }
 function closeShare(){ sheet.classList.remove("on"); }
 sheet.addEventListener("click", function(e){ if(e.target===sheet || e.target===sheetIn) closeShare(); });
@@ -791,23 +1504,67 @@ document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeShar
 
 /* ---------- 言語切り替え ---------- */
 function setLang(l){
+  var first = (LANG===l && !screen.innerHTML);
   LANG=l;
   document.documentElement.lang=l;
   document.title=L("docTitle");
   $("markTitle").innerHTML=L("brand")+"<span>"+L("brandSub")+"</span>";
   $("langJa").setAttribute("aria-pressed", String(l==="ja"));
   $("langEn").setAttribute("aria-pressed", String(l==="en"));
-  store.save({lang:l, code:(result?result.code:saved.code), pct:(result?result.pct:saved.pct), runs:runs});
-  if(sheet.classList.contains("on")){ openShare(); return; }
-  if(step===-1) renderIntro();
-  else if(result) renderResult();
-  else renderQ();
+  persist({lang:l});
+  if(!first) Music.sfx("tap");
+  /* 「魔法陣を描いています」の最中は step が 12。以前はここで renderQ に落ちて
+     Q[12] を読み、画面が壊れていた。演出を最初からやり直す。 */
+  if(step>=Q.length && !result){ renderCalc(); return; }
+  if(sheet.classList.contains("on") && result){ openShare(); return; }
+  if(sheet.classList.contains("on")) closeShare();
+  if(booted){
+    if(step===-1) renderIntro();
+    else if(result) renderResult(true);
+    else renderQ();
+  }
 }
+var booted=false;
+function sndIcon(){
+  var on = Music.isOn();
+  var c = on ? "#fff" : "var(--plum)";
+  $("sndBtn").innerHTML =
+    '<svg viewBox="0 0 24 24" fill="none" stroke="'+c+'" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+
+    '<path d="M4 9v6h4l5 4V5L8 9H4z"/>'+
+    (on ? '<path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/>'
+        : '<path d="M17 9.5l4 5M21 9.5l-4 5"/>')+
+    '</svg>';
+  $("sndBtn").setAttribute("aria-pressed", String(on));
+  $("sndBtn").setAttribute("aria-label", on ? L("bgmOff") : L("bgmOn"));
+}
+$("sndBtn").onclick=function(){ var v=Music.toggle(); sndIcon(); if(v) Music.sfx("open"); buzz(10); };
+$("markTitle").onclick=function(){ closeShare(); Music.sfx("back"); renderIntro(); };
+document.addEventListener("click", function(){ Music.resume(); });
+document.addEventListener("visibilitychange", function(){ document.hidden ? Music.pause() : Music.unpause(); });
 $("langJa").onclick=function(){ setLang("ja"); };
 $("langEn").onclick=function(){ setLang("en"); };
 
 /* ---------- 起動 ---------- */
+/* #w=SYNT でその魔女の結果画面を直接ひらく。
+   友だちが貼ったリンクを踏んだ人が、そのまま自分の診断に進める導線。 */
+function routeFromHash(){
+  var m=/[#&]w=([A-Z]{4})/.exec(location.hash||"");
+  if(!m || !TYPES[m[1]]) return false;
+  var pct={water:50,muscle:50,rhythm:50,mind:50};
+  var pm=/[#&]p=(\d{1,3})-(\d{1,3})-(\d{1,3})-(\d{1,3})/.exec(location.hash);
+  if(pm) pct={water:+pm[1],muscle:+pm[2],rhythm:+pm[3],mind:+pm[4]};
+  friendMode = (saved.code !== m[1]);
+  result={code:m[1], sc:null, pct:pct};
+  step=-1;
+  renderResult(true);
+  return true;
+}
+
 setLang(LANG);
+sndIcon();
+booted=true;
+if(!routeFromHash()) renderIntro();
+window.addEventListener("hashchange", function(){ if(!routeFromHash()) renderIntro(); });
 
 window.__witch={
   types:TYPES, questions:Q, icon:icon,
@@ -819,7 +1576,11 @@ window.__witch={
   result:function(){ return result; },
   setResult:function(r){ result=r; renderResult(); },
   lang:function(){ return LANG; },
-  share:openShare, codex:renderCodex, intro:renderIntro, detail:openDetail, img:imgURL
+  seen:function(){ return seen.slice(); },
+  rarity:function(c){ return {p:rarityP(c), lv:rarityLv(c), pct:rarityPct(c)}; },
+  buildCard:function(c){ return buildCard(c||(result&&result.code)||"SYNT"); },
+  saved:function(){ return saved; },
+  share:openShare, codex:renderCodex, intro:renderIntro, detail:openDetail, music:Music, img:imgURL
 };
 })();
 </script>
