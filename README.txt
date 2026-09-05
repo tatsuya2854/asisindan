@@ -1,14 +1,30 @@
-美脚の魔女図鑑 - アップロード手順
+美脚の魔女図鑑
 
-このフォルダの中身を、まるごと同じ階層にアップロードしてください。
+公開URL： https://tatsuya2854.github.io/asisindan/
 
-  index.html            ← ページ本体
+―――――――――――――――――――――――――――――――
+GitHub Pages の設定（最初の1回だけ）
+―――――――――――――――――――――――――――――――
+1. https://github.com/tatsuya2854/asisindan/settings/pages を開く
+2. Build and deployment → Source を「Deploy from a branch」にする
+3. Branch を「main」／フォルダは「/ (root)」を選んで Save
+
+1〜2分で上のURLで見られるようになります。
+以降は main に push するたび自動で反映されます。
+
+―――――――――――――――――――――――――――――――
+ファイル構成
+―――――――――――――――――――――――――――――――
+このフォルダの中身を、まるごと同じ階層に置いてください。
+
+  index.html            ← ページ本体（Pagesはこれを最初に開く）
   leg-witch.html        ← index.html と中身は同じ（どちらで開いてもOK）
   ogp.jpg               ← X / LINE にリンクを貼ったときに出るカード画像
   manifest.webmanifest  ← ホーム画面に追加したときの設定
   app-icon.png          ← ホーム画面のアイコン
   img/                  ← イラスト16枚（結果・詳細・シェアカード用）
   img/t/                ← サムネイル16枚（図鑑の一覧用）
+  .nojekyll             ← Pagesの余計な変換を止めるための空ファイル
 
 ・フォルダ構成を変えなければ、そのまま動きます。
 ・画像を差し替えたときは img フォルダごと入れ替えてください。
@@ -45,6 +61,10 @@
 OGP画像を差し替えるとき
 ―――――――――――――――――――――――――――――――
 ・ogp.jpg を 1200x630 の画像に置き換えるだけです。
-・独自ドメインに置く場合は、index.html の
-    <meta property="og:image" content="ogp.jpg">
-  を絶対URL（https://～/ogp.jpg）にすると確実です。
+・URLは index.html に絶対パスで書いてあります。独自ドメインに移すときは
+  index.html の中の
+    https://tatsuya2854.github.io/asisindan/
+  を新しいURLに一括置換してください（og:url / og:image / twitter:image /
+  canonical の4か所）。
+・XやLINEは画像をキャッシュします。差し替えても古い画像が出るときは
+  X の Card Validator などでキャッシュを更新してください。
