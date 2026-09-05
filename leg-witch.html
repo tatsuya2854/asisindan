@@ -321,21 +321,26 @@ body{
 .hogu + .ad{margin-top:8px;position:relative}
 .hogu + .ad::before{
   content:"";position:absolute;top:-9px;left:50%;width:1.5px;height:9px;
-  background:var(--champagne);transform:translateX(-50%);
+  background:var(--pink-d);opacity:.5;transform:translateX(-50%);
 }
+.ad:active{transform:translateY(1px)}
 
-/* 広告カード（結果画面の下に、控えめに） */
+/* 商品カード。よその広告ではなく「ほぐほぐ1POINTの続き」に見せる */
 .ad{
   display:block;text-decoration:none;color:inherit;margin-top:14px;
-  background:linear-gradient(160deg,#FFFFFF,#FCF3EF);
-  border:1.5px solid var(--line);border-radius:var(--r);padding:14px 15px;
+  background:linear-gradient(160deg,#FFF9F6,#FDEFF1);
+  border:1.5px solid var(--pink);border-radius:var(--r);padding:14px 15px;
   position:relative;
 }
 .ad .pr{
   position:absolute;top:10px;right:12px;font-size:8.5px;font-weight:800;letter-spacing:.12em;
   color:var(--plum-soft);border:1px solid var(--line);border-radius:99px;padding:1px 6px;
 }
-.ad b{display:block;font-family:var(--serif);font-size:14px;margin-bottom:5px}
+.ad .by{
+  display:block;font-family:var(--serif);font-size:10.5px;letter-spacing:.14em;
+  color:var(--pink-d);font-weight:800;margin-bottom:7px;
+}
+.ad b{display:block;font-family:var(--serif);font-size:14.5px;line-height:1.6;margin-bottom:5px}
 .ad span{display:block;font-size:11.5px;line-height:1.7;color:var(--plum-soft)}
 .ad em{
   display:inline-block;margin-top:9px;font-style:normal;font-weight:800;font-size:12px;
@@ -552,7 +557,7 @@ var T = {
   ja:{
     brand:"美脚の魔女図鑑", brandSub:"LEG WITCH CODEX",
     hoguTitle:"あなたのほぐほぐ1POINT", hoguLead:"今日ほぐすなら、ここ。",
-    adPr:"PR", adTitle:"素手だと、途中でやめたくなる。",
+    adPr:"PR", adBy:"なるねぇのアイテム", adTitle:"素手だと、途中でやめたくなる。",
     adBody:"クリームをつけると手がすべって、力を入れなくてもほぐせます。だから続く。",
     adCta:"ほぐほぐクリームを見る",
     docTitle:"美脚の魔女図鑑｜16人の魔女、あなたはどれ？",
@@ -593,7 +598,7 @@ var T = {
   en:{
     brand:"Leg Witch Codex", brandSub:"LEG WITCH CODEX",
     hoguTitle:"Your one massage point", hoguLead:"If you loosen one spot today, make it this.",
-    adPr:"PR", adTitle:"Bare hands make you stop early.",
+    adPr:"PR", adBy:"Naru's own", adTitle:"Bare hands make you stop early.",
     adBody:"With cream your hands glide, so you can loosen up without forcing it. That's why it lasts.",
     adCta:"See the massage cream",
     docTitle:"Leg Witch Codex | Which of the 16 witches are you?",
@@ -848,13 +853,85 @@ function countUp(el, to, ms){
 }
 var AD_EVERY = 1;                    /* PR枠を出す頻度。1=毎回、3なら3回に1回 */
 var AD_URL = "https://amzn.to/4bkhWjp";
-function adCard(){
+function adCard(code){
+  if(AD_EVERY <= 0) return "";                              /* 0 で完全に非表示 */
   if(AD_EVERY > 1 && runs % AD_EVERY !== 1) return "";
-  return '<a class="ad" href="'+AD_URL+'" target="_blank" rel="noopener sponsored">'+
+  var br = (code && ADBRIDGE[code]) ? ADBRIDGE[code][LANG] : L("adTitle");
+  return '<a class="ad" id="adLink" href="'+AD_URL+'" target="_blank" rel="noopener sponsored">'+
            '<span class="pr">'+L("adPr")+'</span>'+
-           '<b>'+L("adTitle")+'</b><span>'+L("adBody")+'</span>'+
+           '<span class="by">'+L("adBy")+'</span>'+
+           '<b>'+esc(br)+'</b><span>'+L("adBody")+'</span>'+
            '<em>'+L("adCta")+' →</em></a>';
 }
+
+/* ============================================================
+   商品カードの入口。タイプごとの「ほぐす場所」から自然につなぐ。
+   全員に同じコピーを出すと、直前のほぐほぐ1POINTと話がつながらない。
+   ============================================================ */
+var ADBRIDGE = {
+ SKNT:{ja:"しぼる系は、素手だと肌が引っぱられて痛いんだよね。",
+       en:"Wringing with dry hands just tugs at your skin."},
+ SKNG:{ja:"くるぶしの下は骨が近いから、素手だと指のほうが痛くなる。",
+       en:"Below the ankle bone, dry fingers hurt before your leg does."},
+ SKAT:{ja:"こぶしで押すの、乾いてると擦れて赤くなるんだよね。",
+       en:"Knuckles on dry skin just leave it red."},
+ SKAG:{ja:"ひざの裏、素手だと指がひっかかるでしょ。",
+       en:"Behind the knee, dry fingers catch instead of glide."},
+ SYNT:{ja:"足裏は乾いてると、痛いだけで終わっちゃう。",
+       en:"A dry sole just hurts — nothing else happens."},
+ SYNG:{ja:"指の間は乾燥しやすいから、素手だとこすれちゃう。",
+       en:"Between the toes is dry skin on dry skin."},
+ SYAT:{ja:"アキレス腱は皮膚が薄いから、つまむとき素手だと痛い。",
+       en:"The skin over your Achilles is thin — pinching it dry stings."},
+ SYAG:{ja:"内側はやわらかいぶん、素手だと引っぱっちゃう。",
+       en:"The inner leg is soft, so dry hands drag it."},
+ FKNT:{ja:"太ももは面積が広いから、素手だと途中で手が止まる。",
+       en:"Thighs are wide — dry hands stall halfway."},
+ FKNG:{ja:"ひざの上って、素手だと皮膚が動いてくれないんだよね。",
+       en:"Above the knee the skin won't move under dry hands."},
+ FKAT:{ja:"トントンの前にひと塗り。乾いたまま叩くより効くよ。",
+       en:"One layer before you tap. It beats drumming on dry skin."},
+ FKAG:{ja:"3か所を続けてやるなら、途中で手が止まらないほうがいい。",
+       en:"Three spots in a row works only if your hands never stop."},
+ FYNT:{ja:"かかとの上は狭いから、素手だと爪が当たるんだよね。",
+       en:"It's a narrow spot — dry fingers end up all nail."},
+ FYNG:{ja:"あたためるのが目的なら、手のひらが密着したほうがいい。",
+       en:"If the point is warmth, your palm has to actually stick."},
+ FYAT:{ja:"裏ももは自分だと見えないから、手探りになるでしょ。",
+       en:"You can't see the back of your thigh — it's all by feel."},
+ FYAG:{ja:"足裏をぜんぶ流すなら、途中で止まらないのが大事。",
+       en:"To sweep the whole sole, you can't stop partway."}
+};
+/* ============================================================
+   計測。GA4 / GTM を1行足せばそのまま流れるようにしてある。
+   何も入れていない間は、端末内のカウンタだけが増える。
+   ?src=ig / ?src=yt などを付けて配ると、流入元が全イベントに乗る。
+   ============================================================ */
+var SRC = (function(){
+  try{
+    var m=/[?&]src=([A-Za-z0-9_.\-]{1,32})/.exec(location.search);
+    if(m){ persist({src:m[1]}); return m[1]; }
+    return saved.src || "";
+  }catch(e){ return ""; }
+})();
+function track(name, props){
+  var p={}, k;
+  if(props) for(k in props) if(props.hasOwnProperty(k)) p[k]=props[k];
+  p.src = SRC || "direct";
+  p.lang = LANG;
+  try{
+    window.dataLayer = window.dataLayer || [];
+    var d={event:"lw_"+name};
+    for(k in p) if(p.hasOwnProperty(k)) d[k]=p[k];
+    window.dataLayer.push(d);
+    if(typeof window.gtag==="function") window.gtag("event","lw_"+name,p);
+  }catch(e){}
+  try{
+    var c = (saved.ev && typeof saved.ev==="object") ? saved.ev : {};
+    c[name]=(c[name]||0)+1; persist({ev:c});
+  }catch(e){}
+}
+
 var $=function(id){return document.getElementById(id);};
 var screen=$("screen"), sheet=$("sheet"), sheetIn=$("sheetIn");
 
@@ -1000,6 +1077,7 @@ var Music = (function(){
    ============================================================ */
 function beginQuiz(){
   answers=[]; picked=[]; friendMode=false; step=0;
+  track("start", {run: runs+1});
   Music.sfx("open"); buzz(12);
   if(location.hash) { try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} }
   renderQ();
@@ -1026,7 +1104,7 @@ function renderIntro(){
      (runs>0 ? '<p class="runs">'+L("runsLabel").replace("{n}",runs)+'</p>' : '')+
    '</div></div>';
   $("startBtn").onclick=beginQuiz;
-  $("codexBtn").onclick=function(){ Music.sfx("tap"); renderCodex(); };
+  $("codexBtn").onclick=function(){ track("codex"); Music.sfx("tap"); renderCodex(); };
   if($("resumeBtn")) $("resumeBtn").onclick=function(){
     Music.sfx("tap");
     result={code:saved.code, sc:null, pct:saved.pct||{water:50,muscle:50,rhythm:50,mind:50}};
@@ -1055,6 +1133,7 @@ var ORNAMENT = '<img class="mandala" src="' + MANDALA + '" alt="" aria-hidden="t
 
 function renderQ(){
   if(step<0 || step>=Q.length){ renderIntro(); return; }
+  track("q", {n: step+1});          /* どの設問で落ちているかを見るため */
   var q=Q[step], t=q[LANG];
   /* 回答ずみの数で出す。最後の1問に答えると 100% まで伸びる */
   var pct=Math.round(step/Q.length*100);
@@ -1142,6 +1221,7 @@ function renderCalc(){
     result=pre; runs++;
     var isNew = seen.indexOf(result.code)<0;
     if(isNew) seen.push(result.code);
+    track("complete", {code: result.code, rarity: rarityLv(result.code), isNew: isNew?1:0, seen: seen.length});
     persist({lang:LANG, code:result.code, pct:result.pct, runs:runs, seen:seen});
     renderResult(false, isNew);
   }, total+320));
@@ -1205,16 +1285,20 @@ function renderResult(quiet, isNew){
     '<div class="card hogu"><h3>'+L("hoguTitle")+'</h3>'+
       '<p class="hoguLead">'+L("hoguLead")+'</p>'+
       '<p class="hoguBody">'+esc(ty.hp).replace(/\n/g,"<br>")+'</p></div>'+
-    collectBar()+
-    adCard()+
+    adCard(r.code)+
     '<button class="cta" id="shareBtn">'+(friendMode?L("meToo"):L("share"))+'</button>'+
+    collectBar()+
     '<button class="ghost" id="codexBtn2">'+L("codex")+'</button>'+
     '<button class="ghost" id="againBtn">'+L("again")+'</button>'+
    '</div>';
   markReady();
   animateCollect();
   animateAxes();
-  $("shareBtn").onclick=function(){ if(friendMode){ beginQuiz(); } else { Music.sfx("open"); openShare(); } };
+  $("shareBtn").onclick=function(){
+    if(friendMode){ track("friend_cta"); beginQuiz(); }
+    else { track("share_open",{code:r.code}); Music.sfx("open"); openShare(); }
+  };
+  if($("adLink")) $("adLink").onclick=function(){ track("ad_click",{code:r.code}); };
   $("againBtn").onclick=beginQuiz;
   $("codexBtn2").onclick=function(){ Music.sfx("tap"); renderCodex(); };
   $("matchBtn").onclick=function(){ Music.sfx("open"); openDetail(m); };
@@ -1335,14 +1419,15 @@ function openShare(){
   var text=L("shareText").replace("{name}", ty.n).replace("{catch}", ty.c);
   var url=shareURL(r.code);
   $("xBtn").href="https://twitter.com/intent/tweet?text="+encodeURIComponent(text)+"&url="+encodeURIComponent(url);
-  $("xBtn").onclick=function(){ Music.sfx("tap"); };
+  $("xBtn").onclick=function(){ track("share_x",{code:r.code}); Music.sfx("tap"); };
   $("cpBtn").onclick=function(){
     var t=text+" "+url;
+    track("copy_link",{code:r.code});
     if(navigator.clipboard && navigator.clipboard.writeText){
       navigator.clipboard.writeText(t).then(function(){toast(L("copied"));},function(){toast(L("copyFail"));});
     } else { toast(L("copyFail")); }
   };
-  $("svBtn").onclick=function(){ exportCard(r.code, text, url); };
+  $("svBtn").onclick=function(){ track("save_image",{code:r.code}); exportCard(r.code, text, url); };
   $("clBtn").onclick=closeShare;
   sheet.classList.add("on"); sheetIn.scrollTop=0; markReady();
 }
@@ -1606,6 +1691,9 @@ window.__witch={
   rarity:function(c){ return {p:rarityP(c), lv:rarityLv(c), pct:rarityPct(c)}; },
   buildCard:function(c){ return buildCard(c||(result&&result.code)||"SYNT"); },
   saved:function(){ return saved; },
+  events:function(){ return saved.ev || {}; },
+  src:function(){ return SRC; },
+  track:track,
   share:openShare, codex:renderCodex, intro:renderIntro, detail:openDetail, music:Music, img:imgURL
 };
 })();
