@@ -343,6 +343,26 @@ body{
 }
 .ad:active{transform:translateY(1px)}
 
+/* LINE導線。緑をベタで使うと世界観から浮くので、印だけ緑にする */
+.linecard{
+  display:flex;align-items:flex-start;gap:12px;text-decoration:none;color:inherit;margin-top:12px;
+  background:linear-gradient(160deg,#FFFFFF,#F4FAF3);
+  border:1.5px solid #DCEBD8;border-radius:var(--r);padding:14px 15px;
+}
+.linecard .lmark{
+  flex:0 0 auto;width:38px;height:38px;border-radius:12px;background:#06C755;
+  display:grid;place-items:center;box-shadow:0 4px 12px rgba(6,199,85,.28);
+}
+.linecard .lmark svg{width:23px;height:23px;display:block}
+.linecard .ltx{flex:1;min-width:0}
+.linecard b{display:block;font-family:var(--serif);font-size:14.5px;margin-bottom:5px}
+.linecard .ltx>span{display:block;font-size:11.5px;line-height:1.7;color:var(--plum-soft)}
+.linecard em{
+  display:inline-block;margin-top:9px;font-style:normal;font-weight:800;font-size:12px;
+  color:#2E9E5B;border-bottom:1.5px solid #BFE3C8;padding-bottom:2px;
+}
+.linecard:active{transform:translateY(1px)}
+
 /* 商品カード。よその広告ではなく「ほぐほぐ1POINTの続き」に見せる */
 .ad{
   display:block;text-decoration:none;color:inherit;margin-top:14px;
@@ -624,7 +644,10 @@ var T = {
     saveImg:"画像を保存", shareImg:"シェアする", making:"カードを作っています…",
     savedImg:"画像を保存しました", shareFail:"保存できませんでした",
     shotHintNew:"<b>画像を保存</b>して、ストーリーズに貼ってね",
-    shotHintShare:"<b>シェアする</b>から、そのままストーリーズに送れるよ"
+    shotHintShare:"<b>シェアする</b>から、そのままストーリーズに送れるよ",
+    lineTitle:"つづきは、LINEで。",
+    lineBody:"ほぐす場所は、その日の脚で変わるの。\nあなたの魔女に合わせて、なるねぇが送るね。",
+    lineCta:"なるねぇのLINEを追加"
   },
   en:{
     brand:"Leg Witch Codex", brandSub:"LEG WITCH CODEX",
@@ -668,7 +691,10 @@ var T = {
     saveImg:"Save image", shareImg:"Share", making:"Building your card…",
     savedImg:"Image saved", shareFail:"Could not save",
     shotHintNew:"<b>Save the image</b> and post it to your stories",
-    shotHintShare:"Tap <b>Share</b> to send it straight to your stories"
+    shotHintShare:"Tap <b>Share</b> to send it straight to your stories",
+    lineTitle:"Keep going, on LINE.",
+    lineBody:"Where to loosen changes with the day.\nNaru sends what fits your witch.",
+    lineCta:"Add Naru on LINE"
   }
 };
 function L(k){ var o=T[LANG]; return k.split(".").reduce(function(a,b){return a?a[b]:null;},o) || k; }
@@ -1144,6 +1170,19 @@ function countUp(el, to, ms){
 }
 var AD_EVERY = 1;                    /* PR枠を出す頻度。1=毎回、3なら3回に1回 */
 var AD_URL = "https://amzn.to/4bkhWjp";
+/* LINE公式アカウントの友だち追加URL（https://lin.ee/xxxx など）。
+   空のままだと、この枠は表示されない。 */
+var LINE_URL = "";
+function lineCard(){
+  if(!LINE_URL) return "";
+  return '<a class="linecard" id="lineLink" href="'+LINE_URL+'" target="_blank" rel="noopener">'+
+           '<span class="lmark" aria-hidden="true">'+
+             '<svg viewBox="0 0 24 24"><path d="M12 3.2c-4.9 0-8.9 3.2-8.9 7.2 0 3.6 3.2 6.6 7.5 7.1.3 0 .7.2.8.5.1.2 0 .6 0 .8l-.1.8c0 .2-.2.9.8.5s5.4-3.2 7.4-5.5c1.3-1.4 1.9-2.9 1.9-4.2 0-4-4-7.2-8.9-7.2z" fill="#fff"/></svg>'+
+           '</span>'+
+           '<span class="ltx"><b>'+L("lineTitle")+'</b><span>'+L("lineBody").replace(/\n/g,"<br>")+'</span>'+
+           '<em>'+L("lineCta")+' →</em></span></a>';
+}
+
 function adCard(code){
   if(AD_EVERY <= 0) return "";                              /* 0 で完全に非表示 */
   if(AD_EVERY > 1 && runs % AD_EVERY !== 1) return "";
@@ -1581,6 +1620,7 @@ function renderResult(quiet, isNew){
       '<p class="hoguBody">'+esc(ty.hp).replace(/\n/g,"<br>")+'</p></div>'+
     adCard(r.code)+
     '<button class="cta" id="shareBtn">'+(friendMode?L("meToo"):L("share"))+'</button>'+
+    lineCard()+
     collectBar()+
     '<button class="ghost" id="codexBtn2">'+L("codex")+'</button>'+
     '<button class="ghost" id="againBtn">'+L("again")+'</button>'+
@@ -1593,6 +1633,7 @@ function renderResult(quiet, isNew){
     else { track("share_open",{code:r.code}); Music.sfx("open"); openShare(); }
   };
   if($("adLink")) $("adLink").onclick=function(){ track("ad_click",{code:r.code}); };
+  if($("lineLink")) $("lineLink").onclick=function(){ track("line_click",{code:r.code}); };
   $("againBtn").onclick=beginQuiz;
   $("codexBtn2").onclick=function(){ Music.sfx("tap"); renderCodex(); };
   $("matchBtn").onclick=function(){ Music.sfx("open"); openDetail(m); };
@@ -2021,6 +2062,7 @@ window.__witch={
   saved:function(){ return saved; },
   events:function(){ return saved.ev || {}; },
   src:function(){ return SRC; },
+  setLine:function(u){ LINE_URL=u; if(result) renderResult(true); },
   track:track,
   share:openShare, codex:renderCodex, intro:renderIntro, detail:openDetail, music:Music, img:imgURL
 };
