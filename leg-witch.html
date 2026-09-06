@@ -524,7 +524,8 @@ u{text-decoration:none}
   display:inline-flex;align-items:center;gap:5px;margin:9px auto 0;background:rgba(255,255,255,.8);
   border:1px solid var(--champagne);border-radius:99px;padding:3px 10px;font-size:9.5px;font-weight:800;
 }
-.shot .rarechip u{text-decoration:none;color:#D9A441;letter-spacing:.06em}
+.shot .rarechip .st{color:#D9A441;letter-spacing:.06em}
+.shot .rarechip .st u{color:rgba(88,74,78,.22)}
 .srow .sv{background:linear-gradient(135deg,#C79FAC,#A87C8B);color:#fff}
 .srow button[disabled]{opacity:.55;cursor:default}
 .hint b{color:#FFE7C9}
@@ -622,7 +623,8 @@ var T = {
     lastQ:"さいごの1問", almost:"あと{n}問",
     saveImg:"画像を保存", shareImg:"シェアする", making:"カードを作っています…",
     savedImg:"画像を保存しました", shareFail:"保存できませんでした",
-    shotHintNew:"<b>画像を保存</b>して、ストーリーズに貼ってね"
+    shotHintNew:"<b>画像を保存</b>して、ストーリーズに貼ってね",
+    shotHintShare:"<b>シェアする</b>から、そのままストーリーズに送れるよ"
   },
   en:{
     brand:"Leg Witch Codex", brandSub:"LEG WITCH CODEX",
@@ -665,7 +667,8 @@ var T = {
     lastQ:"Last question", almost:"{n} to go",
     saveImg:"Save image", shareImg:"Share", making:"Building your card…",
     savedImg:"Image saved", shareFail:"Could not save",
-    shotHintNew:"<b>Save the image</b> and post it to your stories"
+    shotHintNew:"<b>Save the image</b> and post it to your stories",
+    shotHintShare:"Tap <b>Share</b> to send it straight to your stories"
   }
 };
 function L(k){ var o=T[LANG]; return k.split(".").reduce(function(a,b){return a?a[b]:null;},o) || k; }
@@ -1720,7 +1723,8 @@ function openShare(){
      '<div class="shotimg"><img class="figure" src="'+imgURL(r.code)+'" alt="'+esc(ty.n)+'" onload="this.classList.add(\'ready\')"></div>'+
      '<div class="nameRow">'+icon(r.code,40).replace('class="emb"','class="emb shotEmb"')+
        '<div><h2>'+esc(ty.n)+'</h2><div class="code2">'+r.code+'</div></div></div>'+
-     '<div class="rarechip"><u>'+stars(lv)+'</u>'+L("rarityOf").replace("{p}", rarityPct(r.code)).replace(/<\/?em>/g,"")+'</div>'+
+     '<div class="rarechip"><span class="st">'+stars(lv)+'</span>'+
+       L("rarityOf").replace("{p}", rarityPct(r.code)).replace(/<\/?em>/g,"")+'</div>'+
      '<p class="cat2">'+esc(ty.c)+'</p>'+
      '<div class="bars">'+bars+'</div>'+
      '<div class="foot"><span class="tag">'+L("tag")+'<span>'+L("resultTitle")+'</span>'+
@@ -1729,7 +1733,7 @@ function openShare(){
      '</div>'+
    '</div></div>'+
    '<div class="sactions">'+
-     '<p class="hint" id="shotHint">'+L("shotHintNew")+'</p>'+
+     '<p class="hint" id="shotHint">'+(canWebShare()?L("shotHintShare"):L("shotHintNew"))+'</p>'+
      '<div class="srow" style="margin-bottom:8px"><button class="sv" id="svBtn">'+
        (canWebShare() ? L("shareImg") : L("saveImg"))+'</button></div>'+
      '<div class="srow"><a class="x" id="xBtn" target="_blank" rel="noopener">'+L("shareX")+'</a>'+
