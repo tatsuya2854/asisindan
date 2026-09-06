@@ -349,11 +349,11 @@ body{
   background:linear-gradient(160deg,#FFFFFF,#F4FAF3);
   border:1.5px solid #DCEBD8;border-radius:var(--r);padding:14px 15px;
 }
-.linecard .lmark{
+.lmark{
   flex:0 0 auto;width:38px;height:38px;border-radius:12px;background:#06C755;
   display:grid;place-items:center;box-shadow:0 4px 12px rgba(6,199,85,.28);
 }
-.linecard .lmark svg{width:23px;height:23px;display:block}
+.lmark svg{width:23px;height:23px;display:block}
 .linecard .ltx{flex:1;min-width:0}
 .linecard b{display:block;font-family:var(--serif);font-size:14.5px;margin-bottom:5px}
 .linecard .ltx>span{display:block;font-size:11.5px;line-height:1.7;color:var(--plum-soft)}
@@ -380,10 +380,19 @@ body{
 }
 .ad b{display:block;font-family:var(--serif);font-size:14.5px;line-height:1.6;margin-bottom:5px}
 .ad span{display:block;font-size:11.5px;line-height:1.7;color:var(--plum-soft)}
-.ad em{
-  display:inline-block;margin-top:9px;font-style:normal;font-weight:800;font-size:12px;
+.ad .adcta{
+  display:inline-block;margin-top:9px;font-weight:800;font-size:12px;text-decoration:none;
   color:var(--pink-d);border-bottom:1.5px solid var(--pink);padding-bottom:2px;
 }
+.ad .adcta:active{opacity:.6}
+.ad .adline{
+  display:flex;align-items:center;gap:7px;margin-top:12px;padding-top:11px;
+  border-top:1px dashed rgba(88,74,78,.16);
+  font-weight:800;font-size:11.5px;color:#2E9E5B;text-decoration:none;
+}
+.ad .adline:active{opacity:.6}
+.lmark.sm{width:22px;height:22px;border-radius:7px;box-shadow:0 2px 7px rgba(6,199,85,.3)}
+.lmark.sm svg{width:14px;height:14px}
 .toast{
   position:absolute;left:50%;bottom:26px;transform:translateX(-50%) translateY(8px);
   z-index:60;background:var(--ink);color:#fff;border-radius:99px;padding:9px 18px;
@@ -607,7 +616,7 @@ var T = {
     hoguTitle:"あなたのほぐほぐ1POINT", hoguLead:"今日ほぐすなら、ここ。",
     adPr:"PR", adBy:"なるねぇのアイテム", adTitle:"素手だと、途中でやめたくなる。",
     adBody:"クリームをつけると手がすべって、力を入れなくてもほぐせます。だから続く。",
-    adCta:"ほぐほぐクリームを見る",
+    adCta:"ほぐほぐクリームを見る", adLineCta:"チェンミー公式LINE",
     docTitle:"美脚の魔女図鑑｜16人の魔女、あなたはどれ？",
     lead:"あなたの脚には、魔女が棲んでいる。",
     h1:"16人の魔女、<em>あなたはどれ？</em>",
@@ -654,7 +663,7 @@ var T = {
     hoguTitle:"Your one massage point", hoguLead:"If you loosen one spot today, make it this.",
     adPr:"PR", adBy:"Naru's own", adTitle:"Bare hands make you stop early.",
     adBody:"With cream your hands glide, so you can loosen up without forcing it. That's why it lasts.",
-    adCta:"See the massage cream",
+    adCta:"See the massage cream", adLineCta:"Chenmy official LINE",
     docTitle:"Leg Witch Codex | Which of the 16 witches are you?",
     lead:"A witch lives in your legs.",
     h1:"16 witches. <em>Which one are you?</em>",
@@ -1170,9 +1179,12 @@ function countUp(el, to, ms){
 }
 var AD_EVERY = 1;                    /* PR枠を出す頻度。1=毎回、3なら3回に1回 */
 var AD_URL = "https://amzn.to/4bkhWjp";
-/* LINE公式アカウントの友だち追加URL（https://lin.ee/xxxx など）。
-   空のままだと、この枠は表示されない。 */
-var LINE_URL = "";
+/* なるねぇ本人のLINE公式アカウント。結果画面の下に出る。
+   空にすると枠ごと消える。 */
+var LINE_URL = "https://line.me/R/ti/p/@071xawyn";
+/* チェンミー（商品ブランド）のLINE公式アカウント。商品カードの中に出る。
+   空にするとその一行だけ消える。 */
+var AD_LINE_URL = "https://line.me/R/ti/p/@684tcjqk";
 function lineCard(){
   if(!LINE_URL) return "";
   return '<a class="linecard" id="lineLink" href="'+LINE_URL+'" target="_blank" rel="noopener">'+
@@ -1187,11 +1199,18 @@ function adCard(code){
   if(AD_EVERY <= 0) return "";                              /* 0 で完全に非表示 */
   if(AD_EVERY > 1 && runs % AD_EVERY !== 1) return "";
   var br = (code && ADBRIDGE[code]) ? ADBRIDGE[code][LANG] : L("adTitle");
-  return '<a class="ad" id="adLink" href="'+AD_URL+'" target="_blank" rel="noopener sponsored">'+
+  return '<div class="ad">'+
            '<span class="pr">'+L("adPr")+'</span>'+
            '<span class="by">'+L("adBy")+'</span>'+
            '<b>'+esc(br)+'</b><span>'+L("adBody")+'</span>'+
-           '<em>'+L("adCta")+' →</em></a>';
+           '<a class="adcta" id="adLink" href="'+AD_URL+'" target="_blank" rel="noopener sponsored">'+
+             L("adCta")+' →</a>'+
+           (AD_LINE_URL ?
+             '<a class="adline" id="adLineLink" href="'+AD_LINE_URL+'" target="_blank" rel="noopener">'+
+               '<span class="lmark sm" aria-hidden="true">'+
+                 '<svg viewBox="0 0 24 24"><path d="M12 3.2c-4.9 0-8.9 3.2-8.9 7.2 0 3.6 3.2 6.6 7.5 7.1.3 0 .7.2.8.5.1.2 0 .6 0 .8l-.1.8c0 .2-.2.9.8.5s5.4-3.2 7.4-5.5c1.3-1.4 1.9-2.9 1.9-4.2 0-4-4-7.2-8.9-7.2z" fill="#fff"/></svg>'+
+               '</span>'+L("adLineCta")+' →</a>' : '')+
+         '</div>';
 }
 
 /* ============================================================
@@ -1634,6 +1653,7 @@ function renderResult(quiet, isNew){
   };
   if($("adLink")) $("adLink").onclick=function(){ track("ad_click",{code:r.code}); };
   if($("lineLink")) $("lineLink").onclick=function(){ track("line_click",{code:r.code}); };
+  if($("adLineLink")) $("adLineLink").onclick=function(){ track("ad_line_click",{code:r.code}); };
   $("againBtn").onclick=beginQuiz;
   $("codexBtn2").onclick=function(){ Music.sfx("tap"); renderCodex(); };
   $("matchBtn").onclick=function(){ Music.sfx("open"); openDetail(m); };
