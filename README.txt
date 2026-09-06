@@ -54,10 +54,47 @@
 ・シェアされたリンクから来た人には「わたしも診断する」ボタンが出ます。
 
 ―――――――――――――――――――――――――――――――
+計測（GA4）
+―――――――――――――――――――――――――――――――
+測定ID G-N1FTJ40NZJ を index.html に設置済み。
+GA4側での設定作業は不要です（カスタムディメンションの登録も要りません）。
+
+【見る場所】レポート → エンゲージメント → イベント
+
+  lw_start          診断をはじめた
+  lw_q01 … lw_q12   各設問に到達（どこで抜けたかが縦に並ぶ）
+  lw_complete       最後まで終えた
+  lw_ad_click       ほぐほぐクリーム（Amazon）を押した
+  lw_ad_line_click  チェンミー公式LINEを押した
+  lw_line_click     なるねぇのLINEを押した
+  lw_share_open / lw_save_image / lw_share_x / lw_copy_link
+  lw_codex          図鑑を見た
+
+【流入元の出し分け】
+配布するURLに utm_source を付けるだけ。GA4の「トラフィック獲得」に
+そのまま出ます（設定不要）。
+
+  インスタ プロフ    ...?utm_source=instagram&utm_medium=profile
+  インスタ ストーリー ...?utm_source=instagram&utm_medium=story
+  YouTube 概要欄     ...?utm_source=youtube&utm_medium=description
+  シェアカードのQR    自動で utm_source=qr が付きます
+
+・通常レポートへの反映には24〜48時間かかります。
+  すぐ確認したいときは レポート → リアルタイム を見てください。
+
+―――――――――――――――――――――――――――――――
+LINE導線
+―――――――――――――――――――――――――――――――
+  var LINE_URL    = "..."   なるねぇ公式（結果画面のシェアボタン下）
+  var AD_LINE_URL = "..."   チェンミー公式（商品カードの中）
+
+どちらも空文字にすると、その枠だけ表示されなくなります。
+
+―――――――――――――――――――――――――――――――
 数字を変えたいとき（index.html の中）
 ―――――――――――――――――――――――――――――――
-  var AD_URL   = "..."      PR枠のリンク先
-  var AD_EVERY = 1          PR枠を出す頻度（1=毎回、3なら3回に1回）
+  var AD_URL   = "..."      商品カードのリンク先（Amazon）
+  var AD_EVERY = 1          商品カードを出す頻度（1=毎回、0=非表示、3=3回に1回）
   var IMGBASE  = "img/"     画像の置き場所
 
 ―――――――――――――――――――――――――――――――

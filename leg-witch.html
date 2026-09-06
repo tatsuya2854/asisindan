@@ -1258,7 +1258,8 @@ var ADBRIDGE = {
    ============================================================ */
 var SRC = (function(){
   try{
-    var m=/[?&]src=([A-Za-z0-9_.\-]{1,32})/.exec(location.search);
+    var m=/[?&]src=([A-Za-z0-9_.\-]{1,32})/.exec(location.search)
+       || /[?&]utm_source=([A-Za-z0-9_.\-]{1,32})/.exec(location.search);
     if(m){ persist({src:m[1]}); return m[1]; }
     return saved.src || "";
   }catch(e){ return ""; }
@@ -1485,7 +1486,9 @@ var ORNAMENT = '<img class="mandala" src="' + MANDALA + '" alt="" aria-hidden="t
 
 function renderQ(){
   if(step<0 || step>=Q.length){ renderIntro(); return; }
-  track("q", {q_no: step+1});       /* どの設問で落ちているかを見るため */
+  /* lw_q01 … lw_q12 と名前を分ける。GA4のイベント一覧に並ぶだけで
+     「何問目で落ちたか」が設定なしで読めるようにするため。 */
+  track("q"+(step+1<10?"0":"")+(step+1), {q_no: step+1});
   var q=Q[step], t=q[LANG];
   /* 回答ずみの数で出す。最後の1問に答えると 100% まで伸びる */
   var pct=Math.round(step/Q.length*100);
@@ -1743,8 +1746,10 @@ function shareURL(code){
 }
 /* QRの中身。?src=qr を付けるので「QRから何人来たか」も測れる */
 function qrURL(code){
-  try{ return location.origin + location.pathname + "?src=qr#w=" + code; }
-  catch(e){ return shareURL(code); }
+  try{
+    return location.origin + location.pathname +
+           "?utm_source=qr&utm_medium=sharecard#w=" + code;
+  }catch(e){ return shareURL(code); }
 }
 /* マトリクスを canvas に描く。dark はモジュールの色 */
 function drawQR(ctx, m, x, y, size, quiet, dark, light){
